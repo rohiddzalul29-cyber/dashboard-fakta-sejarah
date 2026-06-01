@@ -729,12 +729,12 @@
           <span class="icon">📅</span><span>Sejarah Hari Ini</span>
         </a>
         <div class="sb-nav-label">Lainnya</div>
-        <a href="https://fakta-sejarah.vercel.app/" target="_blank">
+        <a href="index.html" target="_blank">
           <span class="icon">🌐</span><span>Lihat Website</span>
         </a>
       </nav>
       <div class="sb-footer">
-        <a href="https://fakta-sejarah.vercel.app/" target="_blank"
+        <a href="index.html" target="_blank"
           >↗ <span>Buka website publik</span></a
         >
       </div>
@@ -789,6 +789,7 @@
                 <tr>
                   <th>Gambar</th>
                   <th>Judul</th>
+                  <th>Slug</th>
                   <th>Kategori</th>
                   <th>Status</th>
                   <th>Tanggal</th>
@@ -798,7 +799,7 @@
               </thead>
               <tbody id="articleTableBody">
                 <tr>
-                  <td colspan="7" class="no-data">
+                  <td colspan="8" class="no-data">
                     <div class="spinner"></div>
                   </td>
                 </tr>
@@ -824,7 +825,10 @@
                   type="text"
                   id="fTitle"
                   placeholder="Masukkan judul artikel yang menarik..."
+                  oninput="updateSlugPreview()"
                 />
+                <div class="hint">Slug URL dibuat otomatis dari judul.</div>
+                <div id="slugPreview" style="display:none; margin-top:6px; background:var(--surface3); border:1px solid var(--border); padding:7px 12px; font-family:monospace; font-size:0.78rem; color:var(--gold);"></div>
               </div>
               <div class="form-row">
                 <label>Kategori *</label>
@@ -1148,7 +1152,7 @@
       async function loadArticles() {
         const tbody = document.getElementById("articleTableBody");
         tbody.innerHTML =
-          '<tr><td colspan="7" class="no-data"><div class="spinner"></div></td></tr>';
+          '<tr><td colspan="8" class="no-data"><div class="spinner"></div></td></tr>';
         try {
           const { data, error } = await db
             .from("articles")
@@ -1159,7 +1163,7 @@
           updateStats(articles);
           if (!articles.length) {
             tbody.innerHTML =
-              '<tr><td colspan="7" class="no-data">Belum ada artikel. Klik "+ Buat Artikel Baru" untuk mulai.</td></tr>';
+              '<tr><td colspan="8" class="no-data">Belum ada artikel. Klik "+ Buat Artikel Baru" untuk mulai.</td></tr>';
             return;
           }
           tbody.innerHTML = articles
@@ -1171,6 +1175,7 @@
           ${a.title}
           <small>${a.excerpt ? a.excerpt.slice(0, 60) + "..." : ""}</small>
         </td>
+        <td style="font-size:.72rem;color:var(--gold);font-family:monospace;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${a.slug || ''}">${a.slug || '<span style="color:var(--text-muted)">-</span>'}</td>
         <td><span style="font-size:.75rem;color:var(--text-muted)">${a.category || "-"}</span></td>
         <td><span class="badge ${a.published ? "badge-published" : "badge-draft"}">${a.published ? "Published" : "Draft"}</span></td>
         <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(a.created_at)}</td>
@@ -1187,7 +1192,7 @@
             .join("");
           setStatus(true);
         } catch (e) {
-          tbody.innerHTML = `<tr><td colspan="7" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
           setStatus(false);
           console.error(e);
         }
@@ -1214,6 +1219,13 @@
         document.getElementById("fPublished").checked = a.published || false;
         document.getElementById("formTitle").textContent = "Edit Artikel";
         document.getElementById("saveBtn").textContent = "💾 Simpan Perubahan";
+        // Tampilkan slug preview saat edit
+        const slugPrev = document.getElementById("slugPreview");
+        if (slugPrev) {
+          const existingSlug = a.slug || generateSlug(a.title || "");
+          slugPrev.textContent = '/artikel/' + existingSlug;
+          slugPrev.style.display = 'block';
+        }
         if (a.image_url) {
           const img = document.getElementById("previewImg");
           img.src = a.image_url;
@@ -1235,6 +1247,7 @@
         document.getElementById("fImageUrl").value = "";
         document.getElementById("fPublished").checked = false;
         document.getElementById("previewImg").style.display = "none";
+        document.getElementById("slugPreview").style.display = "none";
         document.getElementById("formTitle").textContent = "Buat Artikel Baru";
         document.getElementById("saveBtn").textContent = "💾 Simpan Artikel";
       }
@@ -1290,6 +1303,40 @@
         }
       }
 
+      // ── SLUG GENERATOR ─────────────────────────────────────
+      function generateSlug(title) {
+        const map = {'à':'a','á':'a','â':'a','ã':'a','è':'e','é':'e','ê':'e','ì':'i','í':'i','ò':'o','ó':'o','ô':'o','ù':'u','ú':'u','ñ':'n','ç':'c'};
+        return (title || '').toLowerCase()
+          .split('').map(c => map[c] || c).join('')
+          .replace(/[^a-z0-9\s-]/g, '').trim()
+          .replace(/\s+/g, '-').replace(/-+/g, '-');
+      }
+
+      function updateSlugPreview() {
+        const title = document.getElementById('fTitle').value;
+        const preview = document.getElementById('slugPreview');
+        if (title.trim()) {
+          preview.textContent = '/artikel/' + generateSlug(title);
+          preview.style.display = 'block';
+        } else {
+          preview.style.display = 'none';
+        }
+      }
+
+      async function makeUniqueSlug(baseSlug, excludeId = null) {
+        let slug = baseSlug;
+        let counter = 0;
+        while (true) {
+          let q = db.from("articles").select("id").eq("slug", slug);
+          if (excludeId) q = q.neq("id", excludeId);
+          const { data, error } = await q;
+          if (error) throw error;
+          if (!data || data.length === 0) return slug;
+          counter++;
+          slug = baseSlug + '-' + counter;
+        }
+      }
+
       async function saveArticle() {
         const id = document.getElementById("editId").value;
         const title = document.getElementById("fTitle").value.trim();
@@ -1317,6 +1364,10 @@
         btn.textContent = "Menyimpan...";
 
         try {
+          // Generate slug unik dari judul
+          const baseSlug = generateSlug(title);
+          const slug = await makeUniqueSlug(baseSlug, id || null);
+
           const payload = {
             title,
             category,
@@ -1324,6 +1375,7 @@
             excerpt,
             image_url,
             published,
+            slug,
             updated_at: new Date().toISOString(),
           };
           let error;
