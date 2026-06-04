@@ -1587,13 +1587,26 @@
             slug,
             updated_at: new Date().toISOString(),
           };
-          let articleId = id;
-          if (id) {
-            const { error } = await db
+
+          // Pastikan articleId bertipe yang sama dengan kolom id di DB.
+          // Input dari hidden field selalu string — konversi ke number jika
+          // id terlihat numerik, atau biarkan sebagai string (untuk UUID).
+          const rawId = id ? id.trim() : "";
+          const numericId = rawId !== "" && /^\d+$/.test(rawId) ? Number(rawId) : rawId || null;
+
+          let articleId = numericId;
+
+          if (numericId) {
+            // UPDATE: pakai .select() agar dapat konfirmasi ID dari DB
+            const { data, error } = await db
               .from("articles")
               .update(payload)
-              .eq("id", id);
+              .eq("id", numericId)
+              .select("id")
+              .single();
             if (error) throw error;
+            // Gunakan ID yang dikembalikan DB — bukan dari input field
+            articleId = data.id;
           } else {
             const { data, error } = await db
               .from("articles")
@@ -1601,8 +1614,11 @@
               .select("id")
               .single();
             if (error) throw error;
+            // Artikel baru: ID berasal dari DB setelah insert berhasil
             articleId = data.id;
           }
+
+          // articleId sekarang dijamin valid dari DB sebelum insert ke article_tags
           // Sync tags: delete existing then re-insert
           await db.from("article_tags").delete().eq("article_id", articleId);
           if (selectedTags.length) {
