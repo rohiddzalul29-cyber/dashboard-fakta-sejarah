@@ -1586,6 +1586,10 @@
             published,
             slug,
             updated_at: new Date().toISOString(),
+            // TODO: Setelah migrasi selesai, jalankan perintah ini di Supabase SQL Editor:
+            //   ALTER TABLE articles ALTER COLUMN category DROP NOT NULL;
+            // lalu hapus baris category di bawah ini.
+            category: "umum",
           };
 
           // Pastikan articleId bertipe yang sama dengan kolom id di DB.
