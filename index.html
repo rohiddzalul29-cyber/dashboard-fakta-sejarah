@@ -1,11 +1,14 @@
-    <!doctype html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Dashboard Admin — Sejarah Setiap Hari</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
       :root {
@@ -23,254 +26,754 @@
         --success: #27ae60;
         --info: #2980b9;
       }
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { font-family: "DM Sans", sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+      }
+      .sidebar {
+        width: 240px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+        position: fixed;
+        height: 100vh;
+        top: 0;
+        left: 0;
+      }
+      .sb-logo {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+      }
+      .sb-logo .logo-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 4px;
+      }
+      .sb-logo-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--gold);
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .sb-logo-title {
+        font-family: "Playfair Display", serif;
+        font-size: 0.95rem;
+        color: #fff;
+      }
+      .sb-logo-sub {
+        font-size: 0.6rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--gold);
+        margin-left: 42px;
+      }
+      .sb-badge {
+        margin-top: 8px;
+        display: inline-block;
+        background: rgba(201, 151, 43, 0.2);
+        color: var(--gold);
+        font-size: 0.6rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 2px;
+      }
+      .sb-nav {
+        padding: 1rem 0;
+        flex: 1;
+      }
+      .sb-nav-label {
+        font-size: 0.6rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 0.8rem 1.5rem 0.4rem;
+      }
+      .sb-nav a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 1.5rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.82rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        border-left: 3px solid transparent;
+      }
+      .sb-nav a:hover {
+        color: var(--text);
+        background: var(--surface2);
+      }
+      .sb-nav a.active {
+        color: var(--gold);
+        background: var(--gold-dim);
+        border-left-color: var(--gold);
+      }
+      .sb-nav a .icon {
+        font-size: 1rem;
+        width: 20px;
+      }
+      .sb-footer {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border);
+      }
+      .sb-footer a {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .sb-footer a:hover {
+        color: var(--gold);
+      }
+      .main {
+        margin-left: 240px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 2rem;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .topbar-title {
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+        color: #fff;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--success);
+      }
+      .status-text {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .content {
+        padding: 2rem;
+        flex: 1;
+      }
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 1.2rem 1.5rem;
+      }
+      .stat-card .label {
+        font-size: 0.65rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+      .stat-card .value {
+        font-family: "Playfair Display", serif;
+        font-size: 2rem;
+        color: var(--gold);
+      }
+      .stat-card .sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+      .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+      }
+      .page-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.3rem;
+        color: #fff;
+      }
+      .btn-primary {
+        background: var(--gold);
+        color: var(--bg);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-primary:hover {
+        background: var(--gold-light);
+      }
+      .btn-secondary {
+        background: var(--surface2);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.72rem;
+        font-weight: 500;
+        padding: 10px 20px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-secondary:hover {
+        border-color: var(--gold);
+        color: var(--gold);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 7px 14px;
+        border: none;
+        cursor: pointer;
+        transition: opacity 0.2s;
+      }
+      .btn-danger:hover {
+        opacity: 0.85;
+      }
+      .btn-edit {
+        background: var(--surface3);
+        color: var(--gold);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 7px 14px;
+        border: 1px solid var(--border);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .btn-edit:hover {
+        background: var(--gold-dim);
+      }
+      .table-wrap {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        font-size: 0.62rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 12px 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+        background: var(--surface2);
+      }
+      td {
+        padding: 14px 1.5rem;
+        font-size: 0.82rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        vertical-align: middle;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .td-title {
+        font-weight: 500;
+        color: #fff;
+        max-width: 280px;
+      }
+      .td-title small {
+        display: block;
+        color: var(--text-muted);
+        font-size: 0.72rem;
+        font-weight: 400;
+        margin-top: 2px;
+      }
+      .td-thumb {
+        width: 52px;
+        height: 40px;
+        object-fit: cover;
+        border-radius: 2px;
+        background: var(--surface2);
+      }
+      .badge {
+        display: inline-block;
+        font-size: 0.62rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 2px;
+        font-weight: 600;
+      }
+      .badge-published {
+        background: rgba(39, 174, 96, 0.2);
+        color: #27ae60;
+      }
+      .badge-draft {
+        background: rgba(127, 140, 141, 0.2);
+        color: #7f8c8d;
+      }
+      .td-actions {
+        display: flex;
+        gap: 6px;
+      }
+      .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+      }
+      .form-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 2rem;
+      }
+      .form-row {
+        margin-bottom: 1.4rem;
+      }
+      .form-row label {
+        display: block;
+        font-size: 0.68rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+      }
+      .form-row input,
+      .form-row select,
+      .form-row textarea {
+        width: 100%;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        padding: 10px 14px;
+        outline: none;
+        transition: border-color 0.2s;
+        border-radius: 0;
+      }
+      .form-row input:focus,
+      .form-row select:focus,
+      .form-row textarea:focus {
+        border-color: var(--gold);
+      }
+      .form-row textarea {
+        min-height: 260px;
+        resize: vertical;
+        line-height: 1.7;
+      }
+      .form-row .hint {
+        font-size: 0.7rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.4rem;
+      }
+      .publish-row {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        margin-top: 1rem;
+      }
+      .toggle {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+      .toggle input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: var(--surface3);
+        cursor: pointer;
+        border-radius: 24px;
+        transition: background 0.3s;
+      }
+      .slider:before {
+        content: "";
+        position: absolute;
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        top: 3px;
+        background: #fff;
+        border-radius: 50%;
+        transition: transform 0.3s;
+      }
+      input:checked + .slider {
+        background: var(--gold);
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+      .toggle-label {
+        font-size: 0.82rem;
+      }
+      .upload-zone {
+        border: 2px dashed var(--border);
+        padding: 2rem;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.2s;
+        background: var(--surface2);
+      }
+      .upload-zone:hover {
+        border-color: var(--gold);
+      }
+      .upload-zone input {
+        display: none;
+      }
+      .upload-zone .uz-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+      }
+      .upload-zone p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+      .upload-zone strong {
+        color: var(--gold);
+      }
+      .preview-img {
+        max-height: 160px;
+        max-width: 100%;
+        margin-top: 1rem;
+        border: 1px solid var(--border);
+        display: none;
+      }
+      .upload-progress {
+        height: 3px;
+        background: var(--surface3);
+        margin-top: 8px;
+        display: none;
+      }
+      .upload-progress-bar {
+        height: 100%;
+        background: var(--gold);
+        width: 0%;
+        transition: width 0.3s;
+      }
+      .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        font-size: 0.82rem;
+        font-weight: 500;
+        z-index: 9999;
+        display: none;
+        border-left: 4px solid;
+        animation: slideIn 0.3s ease;
+      }
+      .toast.show {
+        display: block;
+      }
+      .toast.success {
+        background: #0d2318;
+        color: #27ae60;
+        border-color: #27ae60;
+      }
+      .toast.error {
+        background: #2c1010;
+        color: #e74c3c;
+        border-color: #e74c3c;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .spinner {
+        width: 28px;
+        height: 28px;
+        border: 2px solid var(--surface3);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .confirm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 999;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .confirm-overlay.open {
+        display: flex;
+      }
+      .confirm-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 2rem;
+        max-width: 380px;
+        width: 90%;
+      }
+      .confirm-box h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+        color: #fff;
+      }
+      .confirm-box p {
+        font-size: 0.83rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+      }
+      .confirm-btns {
+        display: flex;
+        gap: 1rem;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
 
-      /* SIDEBAR */
-      .sidebar { width: 240px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; position: fixed; height: 100vh; top: 0; left: 0; overflow-y: auto; }
-      .sb-logo { padding: 1.5rem; border-bottom: 1px solid var(--border); }
-      .sb-logo .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-      .sb-logo-icon { width: 32px; height: 32px; background: var(--gold); border-radius: 3px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-      .sb-logo-title { font-family: "Playfair Display", serif; font-size: 0.95rem; color: #fff; }
-      .sb-logo-sub { font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-left: 42px; }
-      .sb-badge { margin-top: 8px; display: inline-block; background: rgba(201,151,43,0.2); color: var(--gold); font-size: 0.6rem; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; }
-      .sb-nav { padding: 1rem 0; flex: 1; }
-      .sb-nav-label { font-size: 0.6rem; letter-spacing: 3px; text-transform: uppercase; color: var(--text-muted); padding: 0.8rem 1.5rem 0.4rem; }
-      .sb-nav a { display: flex; align-items: center; gap: 10px; padding: 10px 1.5rem; color: var(--text-muted); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: all 0.2s; border-left: 3px solid transparent; cursor: pointer; }
-      .sb-nav a:hover { color: var(--text); background: var(--surface2); }
-      .sb-nav a.active { color: var(--gold); background: var(--gold-dim); border-left-color: var(--gold); }
-      .sb-nav a .icon { font-size: 1rem; width: 20px; }
-      .sb-footer { padding: 1.5rem; border-top: 1px solid var(--border); }
-      .sb-footer a { font-size: 0.75rem; color: var(--text-muted); text-decoration: none; display: flex; align-items: center; gap: 8px; }
-      .sb-footer a:hover { color: var(--gold); }
-
-      /* MAIN */
-      .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
-
-      /* TOPBAR */
-      .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
-      .topbar-title { font-family: "Playfair Display", serif; font-size: 1.1rem; color: #fff; }
-      .topbar-right { display: flex; align-items: center; gap: 1rem; }
-      .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
-      .status-text { font-size: 0.72rem; color: var(--text-muted); }
-
-      /* CONTENT AREA */
-      .content { padding: 2rem; flex: 1; }
-
-      /* STATS */
-      .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
-      .stat-card { background: var(--surface); border: 1px solid var(--border); padding: 1.2rem 1.5rem; }
-      .stat-card .label { font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
-      .stat-card .value { font-family: "Playfair Display", serif; font-size: 2rem; color: var(--gold); }
-      .stat-card .sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
-
-      /* PAGE HEADERS */
-      .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-      .page-header h2 { font-family: "Playfair Display", serif; font-size: 1.3rem; color: #fff; }
-      .btn-primary { background: var(--gold); color: var(--bg); font-family: "DM Sans", sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 10px 20px; border: none; cursor: pointer; transition: background 0.2s; }
-      .btn-primary:hover { background: var(--gold-light); }
-      .btn-secondary { background: var(--surface2); color: var(--text); font-family: "DM Sans", sans-serif; font-size: 0.72rem; font-weight: 500; padding: 10px 20px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
-      .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
-      .btn-danger { background: var(--danger); color: #fff; font-family: "DM Sans", sans-serif; font-size: 0.7rem; font-weight: 600; padding: 7px 14px; border: none; cursor: pointer; transition: opacity 0.2s; }
-      .btn-danger:hover { opacity: 0.85; }
-      .btn-edit { background: var(--surface3); color: var(--gold); font-family: "DM Sans", sans-serif; font-size: 0.7rem; font-weight: 600; padding: 7px 14px; border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; }
-      .btn-edit:hover { background: var(--gold-dim); }
-
-      /* TABLE */
-      .table-wrap { background: var(--surface); border: 1px solid var(--border); overflow-x: auto; }
-      table { width: 100%; border-collapse: collapse; }
-      th { font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); padding: 12px 1.5rem; text-align: left; border-bottom: 1px solid var(--border); background: var(--surface2); }
-      td { padding: 14px 1.5rem; font-size: 0.82rem; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
-      tr:last-child td { border-bottom: none; }
-      tr:hover td { background: rgba(255,255,255,0.02); }
-      .td-title { font-weight: 500; color: #fff; max-width: 280px; }
-      .td-title small { display: block; color: var(--text-muted); font-size: 0.72rem; font-weight: 400; margin-top: 2px; }
-      .td-thumb { width: 52px; height: 40px; object-fit: cover; border-radius: 2px; background: var(--surface2); }
-      .td-avatar { width: 44px; height: 44px; object-fit: cover; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); }
-      .badge { display: inline-block; font-size: 0.62rem; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; font-weight: 600; }
-      .badge-published { background: rgba(39,174,96,0.2); color: #27ae60; }
-      .badge-draft { background: rgba(127,140,141,0.2); color: #7f8c8d; }
-      .td-actions { display: flex; gap: 6px; }
-      .no-data { text-align: center; padding: 3rem; color: var(--text-muted); font-size: 0.85rem; }
-
-      /* FORM PANEL */
-      .form-panel { background: var(--surface); border: 1px solid var(--border); padding: 2rem; }
-      .form-row { margin-bottom: 1.4rem; }
-      .form-row label { display: block; font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.5rem; }
-      .form-row input, .form-row select, .form-row textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); font-family: "DM Sans", sans-serif; font-size: 0.88rem; padding: 10px 14px; outline: none; transition: border-color 0.2s; border-radius: 0; }
-      .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: var(--gold); }
-      .form-row textarea { min-height: 260px; resize: vertical; line-height: 1.7; }
-      .form-row select option { background: var(--surface2); }
-      .form-row .hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 4px; }
-      .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.4rem; }
-      .form-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.4rem; }
-      .publish-row { display: flex; align-items: center; gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 1rem; }
-      .toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
-      .toggle input { opacity: 0; width: 0; height: 0; }
-      .slider { position: absolute; inset: 0; background: var(--surface3); cursor: pointer; border-radius: 24px; transition: background 0.3s; }
-      .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.3s; }
-      input:checked + .slider { background: var(--gold); }
-      input:checked + .slider:before { transform: translateX(20px); }
-      .toggle-label { font-size: 0.82rem; }
-
-      /* IMAGE UPLOAD */
-      .upload-zone { border: 2px dashed var(--border); padding: 2rem; text-align: center; cursor: pointer; transition: border-color 0.2s; background: var(--surface2); }
-      .upload-zone:hover { border-color: var(--gold); }
-      .upload-zone input { display: none; }
-      .upload-zone .uz-icon { font-size: 2rem; margin-bottom: 0.5rem; }
-      .upload-zone p { font-size: 0.8rem; color: var(--text-muted); }
-      .upload-zone strong { color: var(--gold); }
-      .preview-img { max-height: 160px; max-width: 100%; margin-top: 1rem; border: 1px solid var(--border); display: none; }
-      .upload-progress { height: 3px; background: var(--surface3); margin-top: 8px; display: none; }
-      .upload-progress-bar { height: 100%; background: var(--gold); width: 0%; transition: width 0.3s; }
-
-      /* ALERT / TOAST */
-      .toast { position: fixed; bottom: 2rem; right: 2rem; padding: 1rem 1.5rem; font-size: 0.82rem; font-weight: 500; z-index: 9999; display: none; border-left: 4px solid; animation: slideIn 0.3s ease; }
-      .toast.show { display: block; }
-      .toast.success { background: #0d2318; color: #27ae60; border-color: #27ae60; }
-      .toast.error { background: #2c1010; color: #e74c3c; border-color: #e74c3c; }
-      @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
-      /* LOADING */
-      .spinner { width: 28px; height: 28px; border: 2px solid var(--surface3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; display: inline-block; }
-      @keyframes spin { to { transform: rotate(360deg); } }
-
-      /* CONFIRM MODAL */
-      .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 999; display: none; align-items: center; justify-content: center; }
-      .confirm-overlay.open { display: flex; }
-      .confirm-box { background: var(--surface); border: 1px solid var(--border); padding: 2rem; max-width: 380px; width: 90%; }
-      .confirm-box h3 { font-family: "Playfair Display", serif; font-size: 1.1rem; margin-bottom: 0.8rem; color: #fff; }
-      .confirm-box p { font-size: 0.83rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-      .confirm-btns { display: flex; gap: 1rem; }
-
-      /* TABS */
-      .tab-bar { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
-      .tab-btn { padding: 12px 20px; font-family: "DM Sans", sans-serif; font-size: 0.75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; background: none; border: none; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.2s; }
-      .tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
-      .tab-btn:hover { color: var(--text); }
-      .tab-content { display: none; }
-      .tab-content.active { display: block; }
-
-      /* ── TOKOH: PERSON TAG PICKER ── */
-      .person-picker { border: 1px solid var(--border); background: var(--surface2); }
-      .person-picker-search { display: flex; align-items: center; gap: 0; }
-      .person-picker-search input { flex: 1; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--text); font-family: "DM Sans", sans-serif; font-size: 0.85rem; padding: 10px 14px; outline: none; }
-      .person-picker-search input:focus { border-color: var(--gold); }
-      .person-selected-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 14px; min-height: 44px; border-bottom: 1px solid var(--border); }
-      .person-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--gold-dim); border: 1px solid rgba(201,151,43,0.4); color: var(--gold); font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 2px; }
-      .person-tag img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
-      .person-tag .remove-tag { cursor: pointer; font-size: 0.9rem; opacity: 0.7; line-height: 1; }
-      .person-tag .remove-tag:hover { opacity: 1; color: var(--danger); }
-      .person-dropdown { max-height: 220px; overflow-y: auto; }
-      .person-dropdown-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px; cursor: pointer; transition: background 0.15s; font-size: 0.82rem; }
-      .person-dropdown-item:hover { background: var(--surface3); }
-      .person-dropdown-item img { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border); }
-      .person-dropdown-item .pdi-info { flex: 1; }
-      .person-dropdown-item .pdi-name { color: var(--text); font-weight: 500; }
-      .person-dropdown-item .pdi-sub { color: var(--text-muted); font-size: 0.72rem; }
-      .person-dropdown-item.selected { background: var(--gold-dim); }
-      .person-picker-empty { padding: 1rem 1.5rem; color: var(--text-muted); font-size: 0.8rem; }
-
-      /* ── TOKOH: PERSON POPUP ── */
-      .person-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(0px); transition: all 0.25s; }
-      .person-popup-overlay.open { display: flex; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); }
-      .person-popup { background: var(--surface); border: 1px solid rgba(201,151,43,0.35); max-width: 440px; width: 90%; position: relative; transform: translateY(20px); opacity: 0; transition: all 0.25s; overflow: hidden; }
-      .person-popup-overlay.open .person-popup { transform: translateY(0); opacity: 1; }
-      .person-popup-header { position: relative; }
-      .person-popup-banner { width: 100%; height: 100px; object-fit: cover; display: block; filter: brightness(0.4); }
-      .person-popup-banner-placeholder { width: 100%; height: 100px; background: linear-gradient(135deg, var(--surface2), var(--surface3)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; }
-      .person-popup-avatar { position: absolute; bottom: -30px; left: 1.5rem; width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 3px solid var(--gold); background: var(--surface2); }
-      .person-popup-avatar-placeholder { position: absolute; bottom: -30px; left: 1.5rem; width: 64px; height: 64px; border-radius: 50%; border: 3px solid var(--gold); background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-      .person-popup-close { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; border: none; width: 30px; height: 30px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
-      .person-popup-body { padding: 2.5rem 1.5rem 1.5rem; }
-      .person-popup-name { font-family: "Playfair Display", serif; font-size: 1.3rem; color: #fff; margin-bottom: 4px; }
-      .person-popup-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 1rem; }
-      .person-popup-meta span { font-size: 0.72rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
-      .person-popup-desc { font-size: 0.83rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 1.2rem; border-left: 2px solid var(--gold); padding-left: 0.8rem; }
-      .person-popup-btn { display: inline-block; background: var(--gold); color: var(--bg); font-family: "DM Sans", sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 10px 20px; text-decoration: none; cursor: pointer; border: none; transition: background 0.2s; }
-      .person-popup-btn:hover { background: var(--gold-light); }
-
-      /* ── TOKOH: PERSON TAG IN ARTICLE CONTENT ── */
-      .person-mention { color: var(--gold); cursor: pointer; border-bottom: 1px dashed rgba(201,151,43,0.5); font-weight: 600; transition: color 0.2s; }
-      .person-mention:hover { color: var(--gold-light); border-bottom-color: var(--gold-light); }
-
-      /* ── TOKOH: SEARCH BAR ── */
-      .search-bar { display: flex; gap: 10px; margin-bottom: 1.5rem; }
-      .search-bar input { flex: 1; background: var(--surface); border: 1px solid var(--border); color: var(--text); font-family: "DM Sans", sans-serif; font-size: 0.85rem; padding: 10px 14px; outline: none; transition: border-color 0.2s; }
-      .search-bar input:focus { border-color: var(--gold); }
-
-      /* ── TOKOH: PERSON CARD GRID ── */
-      .person-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-      .person-card { background: var(--surface); border: 1px solid var(--border); display: flex; align-items: center; gap: 1rem; padding: 1rem 1.2rem; transition: border-color 0.2s; }
-      .person-card:hover { border-color: rgba(201,151,43,0.5); }
-      .person-card img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border); flex-shrink: 0; }
-      .person-card-placeholder { width: 52px; height: 52px; border-radius: 50%; background: var(--surface2); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
-      .person-card-info { flex: 1; min-width: 0; }
-      .person-card-name { font-weight: 600; color: #fff; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .person-card-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
-      .person-card-actions { display: flex; gap: 6px; flex-shrink: 0; }
-
-      /* ── SECTION HEADER ── */
-      .section-header { font-family: "Playfair Display", serif; font-size: 1rem; color: var(--gold); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+      /* ── TAG INPUT SYSTEM ── */
+      .tag-input-wrap {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        padding: 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        min-height: 46px;
+        cursor: text;
+        transition: border-color 0.2s;
+        position: relative;
+      }
+      .tag-input-wrap:focus-within {
+        border-color: var(--gold);
+      }
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(201, 151, 43, 0.18);
+        border: 1px solid rgba(201, 151, 43, 0.4);
+        color: var(--gold-light);
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 2px;
+        white-space: nowrap;
+      }
+      .tag-chip .remove-tag {
+        cursor: pointer;
+        opacity: 0.7;
+        font-size: 0.85rem;
+        line-height: 1;
+        background: none;
+        border: none;
+        color: var(--gold-light);
+        padding: 0 2px;
+      }
+      .tag-chip .remove-tag:hover {
+        opacity: 1;
+      }
+      .tag-text-input {
+        border: none;
+        background: transparent;
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.88rem;
+        outline: none;
+        min-width: 140px;
+        flex: 1;
+        padding: 2px 4px;
+      }
+      .tag-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border: 1px solid var(--gold);
+        z-index: 200;
+        max-height: 220px;
+        overflow-y: auto;
+        display: none;
+      }
+      .tag-dropdown.open {
+        display: block;
+      }
+      .tag-dd-item {
+        padding: 9px 14px;
+        font-size: 0.82rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--text);
+      }
+      .tag-dd-item:hover,
+      .tag-dd-item.highlighted {
+        background: var(--gold-dim);
+        color: var(--gold-light);
+      }
+      .tag-dd-item .count {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        background: var(--surface2);
+        padding: 2px 6px;
+        border-radius: 2px;
+      }
+      .tag-dd-new {
+        padding: 9px 14px;
+        font-size: 0.82rem;
+        cursor: pointer;
+        color: var(--gold);
+        border-top: 1px solid var(--border);
+        display: none;
+      }
+      .tag-dd-new:hover {
+        background: var(--gold-dim);
+      }
+      .tag-dd-new.show {
+        display: block;
+      }
+      .tag-dd-empty {
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        display: none;
+      }
+      .tag-dd-empty.show {
+        display: block;
+      }
 
       @media (max-width: 900px) {
-        .sidebar { width: 60px; }
-        .sb-logo-title, .sb-logo-sub, .sb-badge, .sb-nav-label, .sb-nav a span { display: none; }
-        .main { margin-left: 60px; }
-        .stats-row { grid-template-columns: 1fr 1fr; }
-        .form-grid, .form-grid-3 { grid-template-columns: 1fr; }
-        .person-grid { grid-template-columns: 1fr; }
+        .sidebar {
+          width: 60px;
+        }
+        .sb-logo-title,
+        .sb-logo-sub,
+        .sb-badge,
+        .sb-nav-label,
+        .sb-nav a span {
+          display: none;
+        }
+        .main {
+          margin-left: 60px;
+        }
+        .stats-row {
+          grid-template-columns: 1fr 1fr;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
-
-    <!-- CONFIRM MODAL HISTORY -->
+    <!-- CONFIRM MODALS -->
     <div class="confirm-overlay" id="hConfirmOverlay">
       <div class="confirm-box">
         <h3>Hapus Artikel Harian?</h3>
-        <p>Tindakan ini tidak bisa dibatalkan. Artikel Sejarah Hari Ini akan dihapus permanen dari database.</p>
+        <p>
+          Tindakan ini tidak bisa dibatalkan. Artikel Sejarah Hari Ini akan
+          dihapus permanen.
+        </p>
         <div class="confirm-btns">
           <button class="btn-danger" id="hConfirmYes">Ya, Hapus</button>
           <button class="btn-secondary" onclick="closeHConfirm()">Batal</button>
         </div>
       </div>
     </div>
-
-    <!-- CONFIRM MODAL ARTIKEL -->
     <div class="confirm-overlay" id="confirmOverlay">
       <div class="confirm-box">
         <h3>Hapus Artikel?</h3>
-        <p>Tindakan ini tidak bisa dibatalkan. Artikel akan dihapus permanen dari database.</p>
+        <p>
+          Tindakan ini tidak bisa dibatalkan. Artikel akan dihapus permanen dari
+          database.
+        </p>
         <div class="confirm-btns">
           <button class="btn-danger" id="confirmYes">Ya, Hapus</button>
           <button class="btn-secondary" onclick="closeConfirm()">Batal</button>
         </div>
       </div>
     </div>
-
-    <!-- CONFIRM MODAL TOKOH -->
-    <div class="confirm-overlay" id="personConfirmOverlay">
+    <div class="confirm-overlay" id="tagConfirmOverlay">
       <div class="confirm-box">
-        <h3>Hapus Tokoh?</h3>
-        <p>Tindakan ini tidak bisa dibatalkan. Tokoh akan dihapus permanen beserta semua relasi artikel.</p>
+        <h3>Hapus Tag?</h3>
+        <p>
+          Tag akan dihapus dari semua artikel yang menggunakannya. Tindakan ini
+          tidak bisa dibatalkan.
+        </p>
         <div class="confirm-btns">
-          <button class="btn-danger" id="personConfirmYes">Ya, Hapus</button>
-          <button class="btn-secondary" onclick="closePersonConfirm()">Batal</button>
+          <button class="btn-danger" id="tagConfirmYes">Ya, Hapus Tag</button>
+          <button class="btn-secondary" onclick="closeTagConfirm()">
+            Batal
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- PERSON POPUP -->
-    <div class="person-popup-overlay" id="personPopupOverlay" onclick="closePersonPopup(event)">
-      <div class="person-popup" id="personPopup">
-        <div class="person-popup-header" id="personPopupHeader"></div>
-        <button class="person-popup-close" onclick="closePersonPopupDirect()">✕</button>
-        <div class="person-popup-body" id="personPopupBody"></div>
-      </div>
-    </div>
-
-    <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
     <!-- SIDEBAR -->
@@ -284,30 +787,28 @@
         <span class="sb-badge">Dashboard</span>
       </div>
       <nav class="sb-nav">
-        <div class="sb-nav-label">Artikel</div>
-        <a href="#" class="active" onclick="showTab('list', this)">
-          <span class="icon">📋</span><span>Daftar Artikel</span>
-        </a>
-        <a href="#" onclick="showTab('create', this)">
-          <span class="icon">✍️</span><span>Buat Artikel</span>
-        </a>
-        <a href="#" onclick="showTab('history', this)">
-          <span class="icon">📅</span><span>Sejarah Hari Ini</span>
-        </a>
-        <div class="sb-nav-label">Tokoh</div>
-        <a href="#" onclick="showTab('person-list', this)">
-          <span class="icon">👤</span><span>Daftar Tokoh</span>
-        </a>
-        <a href="#" onclick="showTab('person-create', this)">
-          <span class="icon">➕</span><span>Tambah Tokoh</span>
-        </a>
+        <div class="sb-nav-label">Menu</div>
+        <a href="#" class="active" onclick="showTab('list', this)"
+          ><span class="icon">📋</span><span>Daftar Artikel</span></a
+        >
+        <a href="#" onclick="showTab('create', this)"
+          ><span class="icon">✍️</span><span>Buat Artikel</span></a
+        >
+        <a href="#" onclick="showTab('history', this)"
+          ><span class="icon">📅</span><span>Sejarah Hari Ini</span></a
+        >
+        <a href="#" onclick="showTab('tags', this)"
+          ><span class="icon">🏷️</span><span>Kelola Tag</span></a
+        >
         <div class="sb-nav-label">Lainnya</div>
-        <a href="index.html" target="_blank">
-          <span class="icon">🌐</span><span>Lihat Website</span>
-        </a>
+        <a href="index.html" target="_blank"
+          ><span class="icon">🌐</span><span>Lihat Website</span></a
+        >
       </nav>
       <div class="sb-footer">
-        <a href="index.html" target="_blank">↗ <span>Buka website publik</span></a>
+        <a href="index.html" target="_blank"
+          >↗ <span>Buka website publik</span></a
+        >
       </div>
     </aside>
 
@@ -322,7 +823,6 @@
       </div>
 
       <div class="content">
-        <!-- STATS -->
         <div class="stats-row" id="statsRow">
           <div class="stat-card">
             <div class="label">Total Artikel</div>
@@ -335,9 +835,9 @@
             <div class="sub">Artikel aktif</div>
           </div>
           <div class="stat-card">
-            <div class="label">Total Tokoh</div>
-            <div class="value" id="statPersons">-</div>
-            <div class="sub">Database tokoh</div>
+            <div class="label">Draft</div>
+            <div class="value" id="statDraft">-</div>
+            <div class="sub">Belum dipublish</div>
           </div>
           <div class="stat-card">
             <div class="label">Total Views</div>
@@ -346,86 +846,136 @@
           </div>
         </div>
 
-        <!-- ═══════════════════════════════════ TAB: LIST -->
+        <!-- TAB: LIST -->
         <div class="tab-content active" id="tab-list">
           <div class="page-header">
             <h2>Daftar Artikel</h2>
-            <button class="btn-primary" onclick="showTab('create')">+ Buat Artikel Baru</button>
+            <button class="btn-primary" onclick="showTab('create')">
+              + Buat Artikel Baru
+            </button>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Gambar</th><th>Judul</th><th>Slug</th><th>Kategori</th><th>Status</th><th>Tanggal</th><th>Views</th><th>Aksi</th>
+                  <th>Gambar</th>
+                  <th>Judul</th>
+                  <th>Slug</th>
+                  <th>Tag</th>
+                  <th>Status</th>
+                  <th>Tanggal</th>
+                  <th>Views</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="articleTableBody">
-                <tr><td colspan="8" class="no-data"><div class="spinner"></div></td></tr>
+                <tr>
+                  <td colspan="8" class="no-data">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- ═══════════════════════════════════ TAB: CREATE/EDIT -->
+        <!-- TAB: CREATE/EDIT -->
         <div class="tab-content" id="tab-create">
           <div class="page-header">
             <h2 id="formTitle">Buat Artikel Baru</h2>
-            <button class="btn-secondary" onclick="showTab('list')">← Kembali ke Daftar</button>
+            <button class="btn-secondary" onclick="showTab('list')">
+              ← Kembali ke Daftar
+            </button>
           </div>
           <div class="form-panel">
             <input type="hidden" id="editId" />
             <div class="form-grid">
-              <div class="form-row" style="grid-column:1/-1">
+              <div class="form-row" style="grid-column: 1/-1">
                 <label>Judul Artikel *</label>
-                <input type="text" id="fTitle" placeholder="Masukkan judul artikel yang menarik..." oninput="updateSlugPreview()" />
+                <input
+                  type="text"
+                  id="fTitle"
+                  placeholder="Masukkan judul artikel yang menarik..."
+                  oninput="updateSlugPreview()"
+                />
                 <div class="hint">Slug URL dibuat otomatis dari judul.</div>
-                <div id="slugPreview" style="display:none;margin-top:6px;background:var(--surface3);border:1px solid var(--border);padding:7px 12px;font-family:monospace;font-size:0.78rem;color:var(--gold)"></div>
+                <div
+                  id="slugPreview"
+                  style="
+                    display: none;
+                    margin-top: 6px;
+                    background: var(--surface3);
+                    border: 1px solid var(--border);
+                    padding: 7px 12px;
+                    font-family: monospace;
+                    font-size: 0.78rem;
+                    color: var(--gold);
+                  "
+                ></div>
               </div>
-              <div class="form-row">
-                <label>Kategori *</label>
-                <select id="fCategory">
-                  <option value="">Pilih Kategori</option>
-                  <option>Sejarah Indonesia</option>
-                  <option>Sejarah Dunia</option>
-                  <option>Tokoh</option>
-                  <option>Perang</option>
-                  <option>Fakta Sejarah</option>
-                </select>
+              <div class="form-row" style="grid-column: 1/-1">
+                <label>Kategori / Tag *</label>
+                <div
+                  class="tag-input-wrap"
+                  id="tagInputWrap"
+                  onclick="focusTagInput()"
+                >
+                  <div id="tagChips"></div>
+                  <input
+                    class="tag-text-input"
+                    id="tagTextInput"
+                    type="text"
+                    placeholder="Ketik untuk mencari atau buat tag baru..."
+                    autocomplete="off"
+                  />
+                  <div class="tag-dropdown" id="tagDropdown">
+                    <div class="tag-dd-empty" id="tagDdEmpty">
+                      Tidak ada tag yang cocok.
+                    </div>
+                    <div id="tagDdList"></div>
+                    <div
+                      class="tag-dd-new"
+                      id="tagDdNew"
+                      onclick="createAndAddTag()"
+                    ></div>
+                  </div>
+                </div>
+                <div class="hint">
+                  Ketik nama tag lalu pilih dari saran, atau tekan Enter untuk
+                  membuat tag baru.
+                </div>
               </div>
               <div class="form-row">
                 <label>Ringkasan (Excerpt)</label>
-                <input type="text" id="fExcerpt" placeholder="Ringkasan singkat 1-2 kalimat..." />
-                <div class="hint">Ditampilkan di card artikel pada halaman utama.</div>
-              </div>
-            </div>
-
-            <div class="form-row">
-              <label>Isi Artikel * (HTML + tag [person][/person] diperbolehkan)</label>
-              <textarea id="fContent" placeholder="Tulis isi artikel di sini... Gunakan [person]Nama Tokoh[/person] untuk menandai tokoh sejarah dalam teks."></textarea>
-              <div class="hint">Gunakan <code style="background:var(--surface3);padding:2px 6px;color:var(--gold)">[person]Napoleon Bonaparte[/person]</code> untuk membuat nama tokoh jadi interaktif.</div>
-            </div>
-
-            <!-- SECTION: TOKOH TERKAIT -->
-            <div class="form-row">
-              <div class="section-header">👤 Tokoh Terkait</div>
-              <div class="hint" style="margin-bottom:0.8rem">Cari dan pilih tokoh sejarah yang berkaitan dengan artikel ini. Mendukung banyak tokoh.</div>
-              <div class="person-picker" id="articlePersonPicker">
-                <div class="person-selected-list" id="articlePersonSelected">
-                  <span style="font-size:0.75rem;color:var(--text-muted);padding:2px">Belum ada tokoh yang dipilih</span>
-                </div>
-                <div class="person-picker-search">
-                  <input type="text" id="articlePersonSearch" placeholder="🔍  Cari tokoh sejarah..." oninput="filterPersonDropdown()" onfocus="showPersonDropdown()" />
-                </div>
-                <div class="person-dropdown" id="articlePersonDropdown" style="display:none">
-                  <div class="person-picker-empty">Ketik untuk mencari tokoh...</div>
+                <input
+                  type="text"
+                  id="fExcerpt"
+                  placeholder="Ringkasan singkat 1-2 kalimat..."
+                />
+                <div class="hint">
+                  Ditampilkan di card artikel pada halaman utama.
                 </div>
               </div>
             </div>
-
+            <div class="form-row">
+              <label>Isi Artikel * (HTML diperbolehkan)</label>
+              <textarea
+                id="fContent"
+                placeholder="Tulis isi artikel di sini... Gunakan tag HTML seperti <p>, <strong>, <em>, <h2>, dll."
+              ></textarea>
+            </div>
             <div class="form-row">
               <label>Upload Gambar Artikel</label>
-              <div class="upload-zone" onclick="document.getElementById('fImageFile').click()">
-                <input type="file" id="fImageFile" accept="image/*" onchange="handleImageUpload(event)" />
+              <div
+                class="upload-zone"
+                onclick="document.getElementById('fImageFile').click()"
+              >
+                <input
+                  type="file"
+                  id="fImageFile"
+                  accept="image/*"
+                  onchange="handleImageUpload(event)"
+                />
                 <div class="uz-icon">🖼️</div>
                 <p><strong>Klik untuk upload gambar</strong></p>
                 <p>JPG, PNG, WEBP — maks. 5MB</p>
@@ -434,863 +984,1134 @@
                 <div class="upload-progress-bar" id="uploadProgressBar"></div>
               </div>
               <img id="previewImg" class="preview-img" alt="Preview" />
-              <div class="hint" style="margin-top:8px">Atau masukkan URL gambar langsung:</div>
-              <input type="text" id="fImageUrl" placeholder="https://..." oninput="previewFromUrl()" style="margin-top:6px" />
+              <div class="hint" style="margin-top: 8px">
+                Atau masukkan URL gambar langsung:
+              </div>
+              <input
+                type="text"
+                id="fImageUrl"
+                placeholder="https://..."
+                oninput="previewFromUrl()"
+                style="margin-top: 6px"
+              />
             </div>
-
             <div class="publish-row">
-              <label class="toggle"><input type="checkbox" id="fPublished" /><span class="slider"></span></label>
-              <span class="toggle-label">Publish artikel (langsung tampil di website publik)</span>
-              <div style="margin-left:auto;display:flex;gap:10px">
-                <button class="btn-secondary" onclick="resetForm()">Reset</button>
-                <button class="btn-primary" onclick="saveArticle()" id="saveBtn">💾 Simpan Artikel</button>
+              <label class="toggle"
+                ><input type="checkbox" id="fPublished" /><span
+                  class="slider"
+                ></span
+              ></label>
+              <span class="toggle-label"
+                >Publish artikel (langsung tampil di website publik)</span
+              >
+              <div style="margin-left: auto; display: flex; gap: 10px">
+                <button class="btn-secondary" onclick="resetForm()">
+                  Reset
+                </button>
+                <button
+                  class="btn-primary"
+                  onclick="saveArticle()"
+                  id="saveBtn"
+                >
+                  💾 Simpan Artikel
+                </button>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ═══════════════════════════════════ TAB: SEJARAH HARI INI -->
+        <!-- TAB: SEJARAH HARI INI -->
         <div class="tab-content" id="tab-history">
           <div class="page-header">
             <h2>Sejarah Hari Ini</h2>
-            <button class="btn-primary" onclick="showHistoryForm()">+ Tambah Artikel Harian</button>
+            <button class="btn-primary" onclick="showHistoryForm()">
+              + Tambah Artikel Harian
+            </button>
           </div>
-          <div style="background:rgba(201,151,43,0.1);border:1px solid var(--border);padding:1rem 1.5rem;margin-bottom:1.5rem;font-size:0.8rem;color:var(--text-muted);line-height:1.7">
-            ⏳ <strong style="color:var(--gold)">Artikel Sementara:</strong> Setiap artikel "Sejarah Hari Ini" akan otomatis hilang dari website publik setelah <strong style="color:var(--text)">24 jam</strong>.
+          <div
+            style="
+              background: rgba(201, 151, 43, 0.1);
+              border: 1px solid var(--border);
+              padding: 1rem 1.5rem;
+              margin-bottom: 1.5rem;
+              font-size: 0.8rem;
+              color: var(--text-muted);
+              line-height: 1.7;
+            "
+          >
+            ⏳
+            <strong style="color: var(--gold)">Artikel Sementara:</strong>
+            Setiap artikel "Sejarah Hari Ini" akan otomatis hilang dari website
+            publik setelah
+            <strong style="color: var(--text)">24 jam</strong> sejak
+            dipublikasikan. Artikel yang sudah kadaluarsa ditandai dengan
+            lencana
+            <span style="color: #c0392b; font-size: 0.7rem">EXPIRED</span>.
           </div>
-          <div class="form-panel" id="historyFormPanel" style="display:none;margin-bottom:1.5rem">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
-              <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff" id="historyFormTitle">Tambah Artikel Sejarah Hari Ini</h3>
-              <button class="btn-secondary" onclick="hideHistoryForm()">✕ Tutup</button>
+          <div
+            class="form-panel"
+            id="historyFormPanel"
+            style="display: none; margin-bottom: 1.5rem"
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1.5rem;
+              "
+            >
+              <h3
+                style="
+                  font-family: &quot;Playfair Display&quot;, serif;
+                  font-size: 1.1rem;
+                  color: #fff;
+                "
+                id="historyFormTitle"
+              >
+                Tambah Artikel Sejarah Hari Ini
+              </h3>
+              <button class="btn-secondary" onclick="hideHistoryForm()">
+                ✕ Tutup
+              </button>
             </div>
             <input type="hidden" id="hEditId" />
             <div class="form-grid">
-              <div class="form-row" style="grid-column:1/-1">
+              <div class="form-row" style="grid-column: 1/-1">
                 <label>Judul / Tanggal Bersejarah *</label>
-                <input type="text" id="hTitle" placeholder="Contoh: 17 Agustus 1945 — Proklamasi Kemerdekaan Indonesia" />
+                <input
+                  type="text"
+                  id="hTitle"
+                  placeholder="Contoh: 17 Agustus 1945 — Proklamasi Kemerdekaan Indonesia"
+                />
               </div>
               <div class="form-row">
                 <label>Tanggal Historis *</label>
-                <input type="text" id="hHistDate" placeholder="Contoh: 17 Agustus 1945" />
+                <input
+                  type="text"
+                  id="hHistDate"
+                  placeholder="Contoh: 17 Agustus 1945"
+                />
               </div>
               <div class="form-row">
                 <label>Berlaku Hingga (otomatis 24 jam)</label>
-                <input type="text" id="hExpiresAt" readonly style="opacity:0.6;cursor:not-allowed" placeholder="Otomatis dihitung saat simpan" />
+                <input
+                  type="text"
+                  id="hExpiresAt"
+                  readonly
+                  style="opacity: 0.6; cursor: not-allowed"
+                  placeholder="Otomatis dihitung saat simpan"
+                />
               </div>
             </div>
             <div class="form-row">
               <label>Ringkasan Singkat *</label>
-              <input type="text" id="hExcerpt" placeholder="Satu kalimat ringkasan peristiwa..." />
+              <input
+                type="text"
+                id="hExcerpt"
+                placeholder="Satu kalimat ringkasan peristiwa..."
+              />
             </div>
             <div class="form-row">
               <label>Isi Lengkap (HTML diperbolehkan)</label>
-              <textarea id="hContent" style="min-height:180px" placeholder="Ceritakan detail peristiwa bersejarah ini..."></textarea>
+              <textarea
+                id="hContent"
+                style="min-height: 180px"
+                placeholder="Ceritakan detail peristiwa bersejarah ini..."
+              ></textarea>
             </div>
             <div class="publish-row">
-              <label class="toggle"><input type="checkbox" id="hPublished" checked /><span class="slider"></span></label>
-              <span class="toggle-label">Publish langsung (tampil di website)</span>
-              <div style="margin-left:auto;display:flex;gap:10px">
-                <button class="btn-secondary" onclick="resetHistoryForm()">Reset</button>
-                <button class="btn-primary" onclick="saveHistory()" id="hSaveBtn">💾 Simpan Artikel Harian</button>
+              <label class="toggle"
+                ><input type="checkbox" id="hPublished" checked /><span
+                  class="slider"
+                ></span
+              ></label>
+              <span class="toggle-label"
+                >Publish langsung (tampil di website)</span
+              >
+              <div style="margin-left: auto; display: flex; gap: 10px">
+                <button class="btn-secondary" onclick="resetHistoryForm()">
+                  Reset
+                </button>
+                <button
+                  class="btn-primary"
+                  onclick="saveHistory()"
+                  id="hSaveBtn"
+                >
+                  💾 Simpan Artikel Harian
+                </button>
               </div>
             </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>Judul / Tanggal Historis</th><th>Ringkasan</th><th>Status</th><th>Dipublikasikan</th><th>Kadaluarsa</th><th>Aksi</th></tr>
+                <tr>
+                  <th>Judul / Tanggal Historis</th>
+                  <th>Ringkasan</th>
+                  <th>Status</th>
+                  <th>Dipublikasikan</th>
+                  <th>Kadaluarsa</th>
+                  <th>Aksi</th>
+                </tr>
               </thead>
               <tbody id="historyTableBody">
-                <tr><td colspan="6" class="no-data"><div class="spinner"></div></td></tr>
+                <tr>
+                  <td colspan="6" class="no-data">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
         </div>
 
-        <!-- ═══════════════════════════════════ TAB: PERSON LIST -->
-        <div class="tab-content" id="tab-person-list">
+        <!-- TAB: KELOLA TAG -->
+        <div class="tab-content" id="tab-tags">
           <div class="page-header">
-            <h2>Daftar Tokoh Sejarah</h2>
-            <button class="btn-primary" onclick="showTab('person-create')">+ Tambah Tokoh</button>
+            <h2>Kelola Tag</h2>
+            <button class="btn-primary" onclick="showTagForm()">
+              + Tambah Tag Baru
+            </button>
           </div>
-          <div class="search-bar">
-            <input type="text" id="personSearchInput" placeholder="🔍  Cari tokoh berdasarkan nama, negara, atau era..." oninput="renderPersonGrid()" />
-          </div>
-          <div id="personGridContainer">
-            <div class="no-data"><div class="spinner"></div></div>
-          </div>
-        </div>
-
-        <!-- ═══════════════════════════════════ TAB: PERSON CREATE/EDIT -->
-        <div class="tab-content" id="tab-person-create">
-          <div class="page-header">
-            <h2 id="personFormTitle">Tambah Tokoh Sejarah</h2>
-            <button class="btn-secondary" onclick="showTab('person-list')">← Kembali ke Daftar</button>
-          </div>
-          <div class="form-panel">
-            <input type="hidden" id="personEditId" />
+          <div
+            class="form-panel"
+            id="tagFormPanel"
+            style="display: none; margin-bottom: 1.5rem"
+          >
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1.5rem;
+              "
+            >
+              <h3
+                style="
+                  font-family: &quot;Playfair Display&quot;, serif;
+                  font-size: 1.1rem;
+                  color: #fff;
+                "
+                id="tagFormTitle"
+              >
+                Tambah Tag Baru
+              </h3>
+              <button class="btn-secondary" onclick="hideTagForm()">
+                ✕ Tutup
+              </button>
+            </div>
+            <input type="hidden" id="tEditId" />
             <div class="form-grid">
-              <div class="form-row" style="grid-column:1/-1">
-                <label>Nama Tokoh *</label>
-                <input type="text" id="pName" placeholder="Nama lengkap tokoh sejarah..." oninput="updatePersonSlug()" />
-                <div id="personSlugPreview" style="display:none;margin-top:6px;background:var(--surface3);border:1px solid var(--border);padding:7px 12px;font-family:monospace;font-size:0.78rem;color:var(--gold)"></div>
+              <div class="form-row">
+                <label>Nama Tag *</label>
+                <input
+                  type="text"
+                  id="tName"
+                  placeholder="Contoh: Kesultanan Utsmaniyah"
+                  oninput="updateTagSlugPreview()"
+                />
               </div>
               <div class="form-row">
-                <label>Slug URL</label>
-                <input type="text" id="pSlug" placeholder="napoleon-bonaparte (auto-generated)" />
-                <div class="hint">Digunakan sebagai URL halaman profil: /tokoh/slug</div>
+                <label>Slug (otomatis)</label>
+                <input
+                  type="text"
+                  id="tSlug"
+                  placeholder="kesultanan-utsmaniyah"
+                  style="font-family: monospace; color: var(--gold)"
+                />
+                <div class="hint">Digunakan untuk URL halaman tag.</div>
               </div>
-              <div class="form-row">
-                <label>Negara / Kebangsaan</label>
-                <input type="text" id="pCountry" placeholder="Contoh: Prancis, Indonesia, Inggris..." />
-              </div>
-              <div class="form-row">
-                <label>Tahun Lahir</label>
-                <input type="number" id="pBorn" placeholder="Contoh: 1769" min="-5000" max="2100" />
-              </div>
-              <div class="form-row">
-                <label>Tahun Wafat</label>
-                <input type="number" id="pDied" placeholder="Contoh: 1821 (kosongkan jika masih hidup)" min="-5000" max="2100" />
+              <div class="form-row" style="grid-column: 1/-1">
+                <label>Deskripsi (opsional)</label>
+                <input
+                  type="text"
+                  id="tDesc"
+                  placeholder="Deskripsi singkat tentang tag ini untuk SEO..."
+                />
               </div>
             </div>
-
-            <div class="form-row">
-              <label>Deskripsi Singkat</label>
-              <input type="text" id="pShortDesc" placeholder="Satu kalimat tentang siapa tokoh ini..." />
-              <div class="hint">Ditampilkan di popup dan daftar tokoh.</div>
-            </div>
-
-            <div class="form-row">
-              <label>Biografi Lengkap (HTML diperbolehkan)</label>
-              <textarea id="pBio" placeholder="Tulis biografi lengkap tokoh di sini..."></textarea>
-            </div>
-
-            <div class="form-row">
-              <label>Foto Tokoh</label>
-              <div class="upload-zone" onclick="document.getElementById('pPhotoFile').click()">
-                <input type="file" id="pPhotoFile" accept="image/*" onchange="handlePersonPhotoUpload(event)" />
-                <div class="uz-icon">👤</div>
-                <p><strong>Klik untuk upload foto</strong></p>
-                <p>JPG, PNG, WEBP — maks. 5MB</p>
-              </div>
-              <div class="upload-progress" id="personUploadProgress">
-                <div class="upload-progress-bar" id="personUploadProgressBar"></div>
-              </div>
-              <img id="personPreviewImg" class="preview-img" alt="Preview" style="border-radius:4px" />
-              <div class="hint" style="margin-top:8px">Atau masukkan URL foto langsung:</div>
-              <input type="text" id="pPhotoUrl" placeholder="https://..." oninput="previewPersonFromUrl()" style="margin-top:6px" />
-            </div>
-
-            <div class="publish-row">
-              <div style="margin-left:auto;display:flex;gap:10px">
-                <button class="btn-secondary" onclick="resetPersonForm()">Reset</button>
-                <button class="btn-primary" onclick="savePerson()" id="personSaveBtn">💾 Simpan Tokoh</button>
-              </div>
+            <div
+              style="
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 1rem;
+              "
+            >
+              <button class="btn-secondary" onclick="resetTagForm()">
+                Reset
+              </button>
+              <button class="btn-primary" onclick="saveTag()" id="tSaveBtn">
+                💾 Simpan Tag
+              </button>
             </div>
           </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama Tag</th>
+                  <th>Slug</th>
+                  <th>Deskripsi</th>
+                  <th>Jumlah Artikel</th>
+                  <th>Dibuat</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="tagTableBody">
+                <tr>
+                  <td colspan="6" class="no-data">
+                    <div class="spinner"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-
-      </div><!-- /content -->
-    </div><!-- /main -->
+      </div>
+      <!-- /content -->
+    </div>
+    <!-- /main -->
 
     <script>
-    // ── KONFIGURASI SUPABASE ────────────────────────────────
-    const SUPABASE_URL = "https://zygecabfainplmdedumx.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5Z2VjYWJmYWlucGxtZGVkdW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDYxMDIsImV4cCI6MjA5NDIyMjEwMn0._oiFgQIuc3a9BckwCG9BxLp61fzp1lmYY7i1YxpJeXI";
-    // ────────────────────────────────────────────────────────
+      const SUPABASE_URL = "https://zygecabfainplmdedumx.supabase.co";
+      const SUPABASE_ANON_KEY =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp5Z2VjYWJmYWlucGxtZGVkdW14Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NDYxMDIsImV4cCI6MjA5NDIyMjEwMn0._oiFgQIuc3a9BckwCG9BxLp61fzp1lmYY7i1YxpJeXI";
+      const { createClient } = supabase;
+      const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const { createClient } = supabase;
-    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      let articles = [];
+      let allTags = [];
+      let selectedTags = []; // array of {id, name, slug}
+      let deleteTargetId = null;
+      let hDeleteTargetId = null;
+      let tagDeleteTargetId = null;
 
-    let articles = [];
-    let deleteTargetId = null;
-    let historyItems = [];
-    let hDeleteTargetId = null;
-    let persons = [];
-    let personDeleteTargetId = null;
-    let selectedArticlePersons = []; // array of person objects for current article form
+      // ── UTILITIES ────────────────────────────────────────────────────
 
-    // ── UTILITIES ─────────────────────────────────────────
-    function showToast(msg, type = "success") {
-      const t = document.getElementById("toast");
-      t.textContent = msg;
-      t.className = "toast show " + type;
-      setTimeout(() => t.classList.remove("show"), 3500);
-    }
+      function showToast(msg, type = "success") {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = "toast show " + type;
+        setTimeout(() => t.classList.remove("show"), 3500);
+      }
 
-    function formatDate(s) {
-      if (!s) return "-";
-      return new Date(s).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" });
-    }
+      function formatDate(s) {
+        if (!s) return "-";
+        return new Date(s).toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+      }
 
-    function formatTime(s) {
-      if (!s) return "";
-      return new Date(s).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
-    }
+      function formatTime(s) {
+        if (!s) return "";
+        return new Date(s).toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
 
-    function setStatus(ok) {
-      document.getElementById("statusDot").style.background = ok ? "var(--success)" : "var(--danger)";
-      document.getElementById("statusText").textContent = ok ? "Terhubung ke Supabase" : "Koneksi gagal";
-    }
+      function generateSlug(title) {
+        const map = {
+          à: "a",
+          á: "a",
+          â: "a",
+          ã: "a",
+          è: "e",
+          é: "e",
+          ê: "e",
+          ì: "i",
+          í: "i",
+          ò: "o",
+          ó: "o",
+          ô: "o",
+          ù: "u",
+          ú: "u",
+          ñ: "n",
+          ç: "c",
+        };
+        return (title || "")
+          .toLowerCase()
+          .split("")
+          .map((c) => map[c] || c)
+          .join("")
+          .replace(/[^a-z0-9\s-]/g, "")
+          .trim()
+          .replace(/\s+/g, "-")
+          .replace(/-+/g, "-");
+      }
 
-    function generateSlug(title) {
-      const map = { à:"a",á:"a",â:"a",ã:"a",è:"e",é:"e",ê:"e",ì:"i",í:"i",ò:"o",ó:"o",ô:"o",ù:"u",ú:"u",ñ:"n",ç:"c" };
-      return (title || "").toLowerCase().split("").map(c => map[c] || c).join("")
-        .replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-");
-    }
+      function setStatus(ok) {
+        document.getElementById("statusDot").style.background = ok
+          ? "var(--success)"
+          : "var(--danger)";
+        document.getElementById("statusText").textContent = ok
+          ? "Terhubung ke Supabase"
+          : "Koneksi gagal";
+      }
 
-    // ── SHOW TAB ──────────────────────────────────────────
-    function showTab(name, el) {
-      document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".sb-nav a").forEach(a => a.classList.remove("active"));
-      const tabEl = document.getElementById("tab-" + name);
-      if (tabEl) tabEl.classList.add("active");
-      if (el) el.classList.add("active");
+      function updateStats(data) {
+        const published = data.filter((a) => a.published).length;
+        document.getElementById("statTotal").textContent = data.length;
+        document.getElementById("statPublished").textContent = published;
+        document.getElementById("statDraft").textContent =
+          data.length - published;
+        document.getElementById("statViews").textContent = data
+          .reduce((s, a) => s + (a.views || 0), 0)
+          .toLocaleString("id-ID");
+      }
 
-      const titles = { list: "Daftar Artikel", create: "Buat Artikel Baru", history: "Sejarah Hari Ini", "person-list": "Daftar Tokoh", "person-create": "Tambah Tokoh" };
-      document.getElementById("topbarTitle").textContent = titles[name] || name;
+      // ── TABS ─────────────────────────────────────────────────────────
 
-      if (name === "list") loadArticles();
-      if (name === "history") loadHistory();
-      if (name === "person-list") { loadPersons(); }
-      if (name === "person-create" && !document.getElementById("personEditId").value) resetPersonForm();
-    }
+      function showTab(name, el) {
+        document
+          .querySelectorAll(".tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        document
+          .querySelectorAll(".sb-nav a")
+          .forEach((a) => a.classList.remove("active"));
+        document.getElementById("tab-" + name).classList.add("active");
+        const titles = {
+          list: "Daftar Artikel",
+          create: "Buat Artikel",
+          history: "Sejarah Hari Ini",
+          tags: "Kelola Tag",
+        };
+        document.getElementById("topbarTitle").textContent =
+          titles[name] || name;
+        if (el) el.classList.add("active");
+        if (name === "list") loadArticles();
+        if (name === "history") loadHistory();
+        if (name === "tags") loadTagsTable();
+      }
 
-    function updateStats(data) {
-      const published = data.filter(a => a.published).length;
-      const views = data.reduce((s, a) => s + (a.views || 0), 0);
-      document.getElementById("statTotal").textContent = data.length;
-      document.getElementById("statPublished").textContent = published;
-      document.getElementById("statViews").textContent = views.toLocaleString("id-ID");
-    }
+      // ── ARTICLES ─────────────────────────────────────────────────────
 
-    // ══════════════════════════════════════════════════════
-    // ARTIKEL
-    // ══════════════════════════════════════════════════════
-    async function loadArticles() {
-      const tbody = document.getElementById("articleTableBody");
-      tbody.innerHTML = '<tr><td colspan="8" class="no-data"><div class="spinner"></div></td></tr>';
-      try {
-        const { data, error } = await db.from("articles").select("*").order("created_at", { ascending: false });
-        if (error) throw error;
-        articles = data || [];
-        updateStats(articles);
-        if (!articles.length) {
-          tbody.innerHTML = '<tr><td colspan="8" class="no-data">Belum ada artikel. Klik "+ Buat Artikel Baru" untuk mulai.</td></tr>';
+      async function loadArticles() {
+        const tbody = document.getElementById("articleTableBody");
+        tbody.innerHTML =
+          '<tr><td colspan="8" class="no-data"><div class="spinner"></div></td></tr>';
+        try {
+          // Load articles with their tags via join
+          const { data, error } = await db
+            .from("articles")
+            .select(`*, article_tags(tag_id, tags(id, name, slug))`)
+            .order("created_at", { ascending: false });
+          if (error) throw error;
+          articles = (data || []).map((a) => ({
+            ...a,
+            tags: (a.article_tags || []).map((at) => at.tags).filter(Boolean),
+          }));
+          updateStats(articles);
+          if (!articles.length) {
+            tbody.innerHTML =
+              '<tr><td colspan="8" class="no-data">Belum ada artikel. Klik "+ Buat Artikel Baru" untuk mulai.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = articles
+            .map(
+              (a) => `
+      <tr>
+        <td><img class="td-thumb" src="${a.image_url || ""}" onerror="this.style.display='none'" alt=""/></td>
+        <td class="td-title">${a.title}<small>${a.excerpt ? a.excerpt.slice(0, 60) + "..." : ""}</small></td>
+        <td style="font-size:.72rem;color:var(--gold);font-family:monospace;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.slug || ""}">${a.slug || '<span style="color:var(--text-muted)">-</span>'}</td>
+        <td><div style="display:flex;flex-wrap:wrap;gap:4px;max-width:200px">${(a.tags || []).map((t) => `<span style="background:rgba(201,151,43,.15);color:var(--gold);font-size:.6rem;padding:2px 6px;border-radius:2px;border:1px solid rgba(201,151,43,.3)">#${t.name}</span>`).join("") || '<span style="color:var(--text-muted);font-size:.75rem">—</span>'}</div></td>
+        <td><span class="badge ${a.published ? "badge-published" : "badge-draft"}">${a.published ? "Published" : "Draft"}</span></td>
+        <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(a.created_at)}</td>
+        <td style="font-size:.8rem">${(a.views || 0).toLocaleString("id-ID")}</td>
+        <td><div class="td-actions"><button class="btn-edit" onclick="editArticle('${a.id}')">✏️ Edit</button><button class="btn-danger" onclick="confirmDelete('${a.id}')">🗑</button></div></td>
+      </tr>`,
+            )
+            .join("");
+          setStatus(true);
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="8" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
+          setStatus(false);
+        }
+      }
+
+      function editArticle(id) {
+        const a = articles.find((x) => x.id === id);
+        if (!a) return;
+        document.getElementById("editId").value = a.id;
+        document.getElementById("fTitle").value = a.title || "";
+        document.getElementById("fExcerpt").value = a.excerpt || "";
+        document.getElementById("fContent").value = a.content || "";
+        document.getElementById("fImageUrl").value = a.image_url || "";
+        document.getElementById("fPublished").checked = a.published || false;
+        document.getElementById("formTitle").textContent = "Edit Artikel";
+        document.getElementById("saveBtn").textContent = "💾 Simpan Perubahan";
+        const slugPrev = document.getElementById("slugPreview");
+        slugPrev.textContent =
+          "/artikel/" + (a.slug || generateSlug(a.title || ""));
+        slugPrev.style.display = "block";
+        if (a.image_url) {
+          const img = document.getElementById("previewImg");
+          img.src = a.image_url;
+          img.style.display = "block";
+        }
+        // Set selected tags
+        selectedTags = (a.tags || []).map((t) => ({
+          id: t.id,
+          name: t.name,
+          slug: t.slug,
+        }));
+        renderTagChips();
+        showTab("create");
+        document.getElementById("topbarTitle").textContent = "Edit Artikel";
+        document.querySelectorAll(".sb-nav a")[1].classList.add("active");
+        document.querySelectorAll(".sb-nav a")[0].classList.remove("active");
+        window.scrollTo(0, 0);
+      }
+
+      function resetForm() {
+        document.getElementById("editId").value = "";
+        document.getElementById("fTitle").value = "";
+        document.getElementById("fExcerpt").value = "";
+        document.getElementById("fContent").value = "";
+        document.getElementById("fImageUrl").value = "";
+        document.getElementById("fPublished").checked = false;
+        document.getElementById("previewImg").style.display = "none";
+        document.getElementById("slugPreview").style.display = "none";
+        document.getElementById("formTitle").textContent = "Buat Artikel Baru";
+        document.getElementById("saveBtn").textContent = "💾 Simpan Artikel";
+        selectedTags = [];
+        renderTagChips();
+      }
+
+      async function handleImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) {
+          showToast("Ukuran file maks. 5MB", "error");
           return;
         }
-        tbody.innerHTML = articles.map(a => `
-          <tr>
-            <td><img class="td-thumb" src="${a.image_url || ""}" onerror="this.style.display='none'" alt=""></td>
-            <td class="td-title">${a.title}<small>${a.excerpt ? a.excerpt.slice(0,60) + "..." : ""}</small></td>
-            <td style="font-size:.72rem;color:var(--gold);font-family:monospace;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${a.slug||""}">${a.slug||'<span style="color:var(--text-muted)">-</span>'}</td>
-            <td><span style="font-size:.75rem;color:var(--text-muted)">${a.category||"-"}</span></td>
-            <td><span class="badge ${a.published?"badge-published":"badge-draft"}">${a.published?"Published":"Draft"}</span></td>
-            <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(a.created_at)}</td>
-            <td style="font-size:.8rem">${(a.views||0).toLocaleString("id-ID")}</td>
-            <td><div class="td-actions">
-              <button class="btn-edit" onclick="editArticle('${a.id}')">✏️ Edit</button>
-              <button class="btn-danger" onclick="confirmDelete('${a.id}')">🗑</button>
-            </div></td>
-          </tr>`).join("");
-        setStatus(true);
-      } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="8" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
-        setStatus(false);
-      }
-    }
-
-    async function editArticle(id) {
-      const a = articles.find(x => x.id === id);
-      if (!a) return;
-      document.getElementById("editId").value = a.id;
-      document.getElementById("fTitle").value = a.title || "";
-      document.getElementById("fCategory").value = a.category || "";
-      document.getElementById("fExcerpt").value = a.excerpt || "";
-      document.getElementById("fContent").value = a.content || "";
-      document.getElementById("fImageUrl").value = a.image_url || "";
-      document.getElementById("fPublished").checked = a.published || false;
-      document.getElementById("formTitle").textContent = "Edit Artikel";
-      document.getElementById("saveBtn").textContent = "💾 Simpan Perubahan";
-      const slugPrev = document.getElementById("slugPreview");
-      const existingSlug = a.slug || generateSlug(a.title || "");
-      slugPrev.textContent = "/artikel/" + existingSlug;
-      slugPrev.style.display = "block";
-      if (a.image_url) { const img = document.getElementById("previewImg"); img.src = a.image_url; img.style.display = "block"; }
-
-      // Load tokoh terkait
-      selectedArticlePersons = [];
-      try {
-        const { data } = await db.from("article_persons").select("person_id, persons(*)").eq("article_id", id);
-        if (data) data.forEach(row => { if (row.persons) selectedArticlePersons.push(row.persons); });
-      } catch(e) {}
-      renderSelectedPersons();
-
-      showTab("create");
-      document.getElementById("topbarTitle").textContent = "Edit Artikel";
-      window.scrollTo(0, 0);
-    }
-
-    function resetForm() {
-      document.getElementById("editId").value = "";
-      document.getElementById("fTitle").value = "";
-      document.getElementById("fCategory").value = "";
-      document.getElementById("fExcerpt").value = "";
-      document.getElementById("fContent").value = "";
-      document.getElementById("fImageUrl").value = "";
-      document.getElementById("fPublished").checked = false;
-      document.getElementById("previewImg").style.display = "none";
-      document.getElementById("slugPreview").style.display = "none";
-      document.getElementById("formTitle").textContent = "Buat Artikel Baru";
-      document.getElementById("saveBtn").textContent = "💾 Simpan Artikel";
-      selectedArticlePersons = [];
-      renderSelectedPersons();
-      document.getElementById("articlePersonDropdown").style.display = "none";
-      document.getElementById("articlePersonSearch").value = "";
-    }
-
-    function updateSlugPreview() {
-      const title = document.getElementById("fTitle").value;
-      const preview = document.getElementById("slugPreview");
-      if (title.trim()) { preview.textContent = "/artikel/" + generateSlug(title); preview.style.display = "block"; }
-      else { preview.style.display = "none"; }
-    }
-
-    async function makeUniqueSlug(table, baseSlug, excludeId = null) {
-      let slug = baseSlug, counter = 0;
-      while (true) {
-        let q = db.from(table).select("id").eq("slug", slug);
-        if (excludeId) q = q.neq("id", excludeId);
-        const { data, error } = await q;
-        if (error) throw error;
-        if (!data || data.length === 0) return slug;
-        counter++;
-        slug = baseSlug + "-" + counter;
-      }
-    }
-
-    async function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 5*1024*1024) { showToast("Ukuran file maks. 5MB", "error"); return; }
-      const progress = document.getElementById("uploadProgress");
-      const bar = document.getElementById("uploadProgressBar");
-      progress.style.display = "block"; bar.style.width = "30%";
-      try {
-        const ext = file.name.split(".").pop();
-        const fileName = `article-${Date.now()}.${ext}`;
-        bar.style.width = "60%";
-        const { error } = await db.storage.from("article-images").upload(fileName, file, { upsert: true });
-        if (error) throw error;
-        bar.style.width = "100%";
-        const { data: urlData } = db.storage.from("article-images").getPublicUrl(fileName);
-        document.getElementById("fImageUrl").value = urlData.publicUrl;
-        const img = document.getElementById("previewImg"); img.src = urlData.publicUrl; img.style.display = "block";
-        showToast("Gambar berhasil diupload ✓");
-      } catch (err) { showToast("Gagal upload: " + err.message, "error"); }
-      finally { setTimeout(() => { progress.style.display = "none"; bar.style.width = "0%"; }, 800); }
-    }
-
-    function previewFromUrl() {
-      const url = document.getElementById("fImageUrl").value.trim();
-      const img = document.getElementById("previewImg");
-      if (url) { img.src = url; img.style.display = "block"; } else { img.style.display = "none"; }
-    }
-
-    async function saveArticle() {
-      const id = document.getElementById("editId").value;
-      const title = document.getElementById("fTitle").value.trim();
-      const category = document.getElementById("fCategory").value;
-      const content = document.getElementById("fContent").value.trim();
-      const excerpt = document.getElementById("fExcerpt").value.trim();
-      const image_url = document.getElementById("fImageUrl").value.trim();
-      const published = document.getElementById("fPublished").checked;
-
-      if (!title) { showToast("Judul tidak boleh kosong", "error"); return; }
-      if (!category) { showToast("Pilih kategori artikel", "error"); return; }
-      if (!content) { showToast("Isi artikel tidak boleh kosong", "error"); return; }
-
-      const btn = document.getElementById("saveBtn");
-      btn.disabled = true; btn.textContent = "Menyimpan...";
-
-      try {
-        const baseSlug = generateSlug(title);
-        const slug = await makeUniqueSlug("articles", baseSlug, id || null);
-        const payload = { title, category, content, excerpt, image_url, published, slug, updated_at: new Date().toISOString() };
-
-        let articleId = id;
-        if (id) {
-          const { error } = await db.from("articles").update(payload).eq("id", id);
+        const progress = document.getElementById("uploadProgress");
+        const bar = document.getElementById("uploadProgressBar");
+        progress.style.display = "block";
+        bar.style.width = "30%";
+        try {
+          const ext = file.name.split(".").pop();
+          const fileName = `article-${Date.now()}.${ext}`;
+          bar.style.width = "60%";
+          const { error } = await db.storage
+            .from("article-images")
+            .upload(fileName, file, { upsert: true });
           if (error) throw error;
+          bar.style.width = "100%";
+          const { data: urlData } = db.storage
+            .from("article-images")
+            .getPublicUrl(fileName);
+          document.getElementById("fImageUrl").value = urlData.publicUrl;
+          const img = document.getElementById("previewImg");
+          img.src = urlData.publicUrl;
+          img.style.display = "block";
+          showToast("Gambar berhasil diupload ✓");
+        } catch (err) {
+          showToast("Gagal upload: " + err.message, "error");
+        } finally {
+          setTimeout(() => {
+            progress.style.display = "none";
+            bar.style.width = "0%";
+          }, 800);
+        }
+      }
+
+      function previewFromUrl() {
+        const url = document.getElementById("fImageUrl").value.trim();
+        const img = document.getElementById("previewImg");
+        if (url) {
+          img.src = url;
+          img.style.display = "block";
         } else {
-          const { data, error } = await db.from("articles").insert([payload]).select();
-          if (error) throw error;
-          articleId = data[0].id;
+          img.style.display = "none";
         }
+      }
 
-        // Save person relations
-        await db.from("article_persons").delete().eq("article_id", articleId);
-        if (selectedArticlePersons.length > 0) {
-          const relations = selectedArticlePersons.map(p => ({ article_id: articleId, person_id: p.id }));
-          const { error: relError } = await db.from("article_persons").insert(relations);
-          if (relError) console.warn("Relasi tokoh gagal:", relError.message);
+      function updateSlugPreview() {
+        const title = document.getElementById("fTitle").value;
+        const preview = document.getElementById("slugPreview");
+        if (title.trim()) {
+          preview.textContent = "/artikel/" + generateSlug(title);
+          preview.style.display = "block";
+        } else preview.style.display = "none";
+      }
+
+      async function makeUniqueSlug(baseSlug, excludeId = null) {
+        let slug = baseSlug,
+          counter = 0;
+        while (true) {
+          let q = db.from("articles").select("id").eq("slug", slug);
+          if (excludeId) q = q.neq("id", excludeId);
+          const { data } = await q;
+          if (!data || data.length === 0) return slug;
+          counter++;
+          slug = baseSlug + "-" + counter;
         }
-
-        showToast(id ? "Artikel berhasil diperbarui ✓" : "Artikel berhasil disimpan ✓");
-        resetForm();
-        showTab("list");
-        document.querySelectorAll(".sb-nav a")[0].classList.add("active");
-      } catch (err) {
-        showToast("Gagal menyimpan: " + err.message, "error");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Artikel";
-      }
-    }
-
-    function confirmDelete(id) { deleteTargetId = id; document.getElementById("confirmOverlay").classList.add("open"); }
-    function closeConfirm() { deleteTargetId = null; document.getElementById("confirmOverlay").classList.remove("open"); }
-    document.getElementById("confirmYes").onclick = async () => {
-      if (!deleteTargetId) return;
-      try {
-        await db.from("article_persons").delete().eq("article_id", deleteTargetId);
-        const { error } = await db.from("articles").delete().eq("id", deleteTargetId);
-        if (error) throw error;
-        closeConfirm(); showToast("Artikel berhasil dihapus"); loadArticles();
-      } catch(e) { showToast("Gagal menghapus: " + e.message, "error"); }
-    };
-
-    // ══════════════════════════════════════════════════════
-    // SEJARAH HARI INI
-    // ══════════════════════════════════════════════════════
-    function showHistoryForm() { resetHistoryForm(); document.getElementById("historyFormPanel").style.display = "block"; document.getElementById("historyFormPanel").scrollIntoView({ behavior: "smooth" }); }
-    function hideHistoryForm() { document.getElementById("historyFormPanel").style.display = "none"; resetHistoryForm(); }
-    function resetHistoryForm() {
-      document.getElementById("hEditId").value = "";
-      document.getElementById("hTitle").value = "";
-      document.getElementById("hHistDate").value = "";
-      document.getElementById("hExcerpt").value = "";
-      document.getElementById("hContent").value = "";
-      document.getElementById("hPublished").checked = true;
-      document.getElementById("hExpiresAt").value = "";
-      document.getElementById("historyFormTitle").textContent = "Tambah Artikel Sejarah Hari Ini";
-      document.getElementById("hSaveBtn").textContent = "💾 Simpan Artikel Harian";
-    }
-
-    async function loadHistory() {
-      const tbody = document.getElementById("historyTableBody");
-      tbody.innerHTML = '<tr><td colspan="6" class="no-data"><div class="spinner"></div></td></tr>';
-      try {
-        const { data, error } = await db.from("daily_history").select("*").order("created_at", { ascending: false });
-        if (error) throw error;
-        historyItems = data || [];
-        if (!historyItems.length) { tbody.innerHTML = '<tr><td colspan="6" class="no-data">Belum ada artikel. Klik "+ Tambah Artikel Harian" untuk mulai.</td></tr>'; return; }
-        const now = new Date();
-        tbody.innerHTML = historyItems.map(h => {
-          const expired = new Date(h.expires_at) < now;
-          const statusBadge = !h.published ? '<span class="badge badge-draft">Draft</span>' : expired ? '<span class="badge" style="background:rgba(192,57,43,.2);color:#c0392b">Expired</span>' : '<span class="badge badge-published">Live</span>';
-          return `<tr style="${expired?"opacity:.55":""}">
-            <td class="td-title">${h.title}<small>${h.hist_date||""}</small></td>
-            <td style="font-size:.78rem;color:var(--text-muted);max-width:200px">${(h.excerpt||"").slice(0,80)}${h.excerpt&&h.excerpt.length>80?"…":""}</td>
-            <td>${statusBadge}</td>
-            <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(h.created_at)}</td>
-            <td style="font-size:.75rem;color:${expired?"var(--danger)":"var(--text-muted)"}">${formatDate(h.expires_at)}<br><small>${formatTime(h.expires_at)}</small></td>
-            <td><div class="td-actions">
-              <button class="btn-edit" onclick="editHistory('${h.id}')">✏️ Edit</button>
-              <button class="btn-danger" onclick="confirmDeleteHistory('${h.id}')">🗑</button>
-            </div></td>
-          </tr>`;
-        }).join("");
-      } catch(e) { tbody.innerHTML = `<tr><td colspan="6" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`; }
-    }
-
-    function editHistory(id) {
-      const h = historyItems.find(x => x.id === id);
-      if (!h) return;
-      document.getElementById("hEditId").value = h.id;
-      document.getElementById("hTitle").value = h.title || "";
-      document.getElementById("hHistDate").value = h.hist_date || "";
-      document.getElementById("hExcerpt").value = h.excerpt || "";
-      document.getElementById("hContent").value = h.content || "";
-      document.getElementById("hPublished").checked = h.published || false;
-      document.getElementById("hExpiresAt").value = h.expires_at ? new Date(h.expires_at).toLocaleString("id-ID") : "";
-      document.getElementById("historyFormTitle").textContent = "Edit Artikel Sejarah Hari Ini";
-      document.getElementById("hSaveBtn").textContent = "💾 Simpan Perubahan";
-      document.getElementById("historyFormPanel").style.display = "block";
-      document.getElementById("historyFormPanel").scrollIntoView({ behavior: "smooth" });
-    }
-
-    async function saveHistory() {
-      const id = document.getElementById("hEditId").value;
-      const title = document.getElementById("hTitle").value.trim();
-      const hist_date = document.getElementById("hHistDate").value.trim();
-      const excerpt = document.getElementById("hExcerpt").value.trim();
-      const content = document.getElementById("hContent").value.trim();
-      const published = document.getElementById("hPublished").checked;
-      if (!title) { showToast("Judul tidak boleh kosong", "error"); return; }
-      if (!hist_date) { showToast("Tanggal historis tidak boleh kosong", "error"); return; }
-      if (!excerpt) { showToast("Ringkasan tidak boleh kosong", "error"); return; }
-      const btn = document.getElementById("hSaveBtn"); btn.disabled = true; btn.textContent = "Menyimpan...";
-      try {
-        const now = new Date();
-        const expires_at = id ? historyItems.find(x=>x.id===id)?.expires_at : new Date(now.getTime()+24*60*60*1000).toISOString();
-        const payload = { title, hist_date, excerpt, content, published, updated_at: now.toISOString() };
-        if (!id) payload.expires_at = expires_at;
-        let error;
-        if (id) { ({error} = await db.from("daily_history").update(payload).eq("id", id)); }
-        else { ({error} = await db.from("daily_history").insert([{...payload, expires_at}])); }
-        if (error) throw error;
-        showToast(id ? "Artikel harian diperbarui ✓" : "Artikel harian disimpan ✓ (aktif 24 jam)");
-        hideHistoryForm(); loadHistory();
-      } catch(err) { showToast("Gagal menyimpan: " + err.message, "error"); }
-      finally { btn.disabled = false; btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Artikel Harian"; }
-    }
-
-    function confirmDeleteHistory(id) { hDeleteTargetId = id; document.getElementById("hConfirmOverlay").classList.add("open"); }
-    function closeHConfirm() { hDeleteTargetId = null; document.getElementById("hConfirmOverlay").classList.remove("open"); }
-    document.getElementById("hConfirmYes").onclick = async () => {
-      if (!hDeleteTargetId) return;
-      try {
-        const { error } = await db.from("daily_history").delete().eq("id", hDeleteTargetId);
-        if (error) throw error;
-        closeHConfirm(); showToast("Artikel harian dihapus"); loadHistory();
-      } catch(e) { showToast("Gagal menghapus: " + e.message, "error"); }
-    };
-
-    // ══════════════════════════════════════════════════════
-    // TOKOH SEJARAH — CRUD
-    // ══════════════════════════════════════════════════════
-    async function loadPersons() {
-      document.getElementById("personGridContainer").innerHTML = '<div class="no-data"><div class="spinner"></div></div>';
-      try {
-        const { data, error } = await db.from("persons").select("*").order("name", { ascending: true });
-        if (error) throw error;
-        persons = data || [];
-        document.getElementById("statPersons").textContent = persons.length;
-        renderPersonGrid();
-        setStatus(true);
-      } catch(e) {
-        document.getElementById("personGridContainer").innerHTML = `<div class="no-data">⚠️ Gagal memuat: ${e.message}</div>`;
-        setStatus(false);
-      }
-    }
-
-    function renderPersonGrid() {
-      const q = (document.getElementById("personSearchInput")?.value || "").toLowerCase();
-      const filtered = persons.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        (p.country||"").toLowerCase().includes(q) ||
-        (p.short_desc||"").toLowerCase().includes(q)
-      );
-      const container = document.getElementById("personGridContainer");
-      if (!filtered.length) {
-        container.innerHTML = '<div class="no-data">Tidak ada tokoh ditemukan. ' + (q ? 'Coba kata kunci lain.' : 'Klik "+ Tambah Tokoh" untuk mulai.') + '</div>';
-        return;
-      }
-      container.innerHTML = `<div class="person-grid">${filtered.map(p => {
-        const lifespan = p.born_year ? (p.died_year ? `${p.born_year} – ${p.died_year}` : `Lahir ${p.born_year}`) : "";
-        return `<div class="person-card">
-          ${p.photo_url
-            ? `<img src="${p.photo_url}" onerror="this.style.display='none'" alt="${p.name}">`
-            : `<div class="person-card-placeholder">👤</div>`}
-          <div class="person-card-info">
-            <div class="person-card-name">${p.name}</div>
-            <div class="person-card-sub">${[p.country, lifespan].filter(Boolean).join(" · ")}</div>
-            <div class="person-card-sub" style="margin-top:2px;font-style:italic">${(p.short_desc||"").slice(0,60)}${p.short_desc&&p.short_desc.length>60?"…":""}</div>
-          </div>
-          <div class="person-card-actions">
-            <button class="btn-edit" onclick="editPerson('${p.id}')">✏️</button>
-            <button class="btn-danger" onclick="confirmDeletePerson('${p.id}')">🗑</button>
-          </div>
-        </div>`;
-      }).join("")}</div>`;
-    }
-
-    function updatePersonSlug() {
-      const name = document.getElementById("pName").value;
-      const slug = generateSlug(name);
-      document.getElementById("pSlug").value = slug;
-      const preview = document.getElementById("personSlugPreview");
-      if (name.trim()) { preview.textContent = "/tokoh/" + slug; preview.style.display = "block"; }
-      else { preview.style.display = "none"; }
-    }
-
-    function resetPersonForm() {
-      document.getElementById("personEditId").value = "";
-      document.getElementById("pName").value = "";
-      document.getElementById("pSlug").value = "";
-      document.getElementById("pCountry").value = "";
-      document.getElementById("pBorn").value = "";
-      document.getElementById("pDied").value = "";
-      document.getElementById("pShortDesc").value = "";
-      document.getElementById("pBio").value = "";
-      document.getElementById("pPhotoUrl").value = "";
-      document.getElementById("personPreviewImg").style.display = "none";
-      document.getElementById("personSlugPreview").style.display = "none";
-      document.getElementById("personFormTitle").textContent = "Tambah Tokoh Sejarah";
-      document.getElementById("personSaveBtn").textContent = "💾 Simpan Tokoh";
-    }
-
-    function editPerson(id) {
-      const p = persons.find(x => x.id === id);
-      if (!p) return;
-      document.getElementById("personEditId").value = p.id;
-      document.getElementById("pName").value = p.name || "";
-      document.getElementById("pSlug").value = p.slug || "";
-      document.getElementById("pCountry").value = p.country || "";
-      document.getElementById("pBorn").value = p.born_year || "";
-      document.getElementById("pDied").value = p.died_year || "";
-      document.getElementById("pShortDesc").value = p.short_desc || "";
-      document.getElementById("pBio").value = p.bio || "";
-      document.getElementById("pPhotoUrl").value = p.photo_url || "";
-      document.getElementById("personFormTitle").textContent = "Edit Tokoh";
-      document.getElementById("personSaveBtn").textContent = "💾 Simpan Perubahan";
-      const preview = document.getElementById("personSlugPreview");
-      preview.textContent = "/tokoh/" + (p.slug || generateSlug(p.name));
-      preview.style.display = "block";
-      if (p.photo_url) { const img = document.getElementById("personPreviewImg"); img.src = p.photo_url; img.style.display = "block"; }
-      showTab("person-create");
-      document.getElementById("topbarTitle").textContent = "Edit Tokoh";
-      window.scrollTo(0, 0);
-    }
-
-    async function savePerson() {
-      const id = document.getElementById("personEditId").value;
-      const name = document.getElementById("pName").value.trim();
-      const slug = document.getElementById("pSlug").value.trim() || generateSlug(name);
-      const country = document.getElementById("pCountry").value.trim();
-      const born_year = document.getElementById("pBorn").value ? parseInt(document.getElementById("pBorn").value) : null;
-      const died_year = document.getElementById("pDied").value ? parseInt(document.getElementById("pDied").value) : null;
-      const short_desc = document.getElementById("pShortDesc").value.trim();
-      const bio = document.getElementById("pBio").value.trim();
-      const photo_url = document.getElementById("pPhotoUrl").value.trim();
-
-      if (!name) { showToast("Nama tokoh tidak boleh kosong", "error"); return; }
-
-      const btn = document.getElementById("personSaveBtn"); btn.disabled = true; btn.textContent = "Menyimpan...";
-      try {
-        const finalSlug = await makeUniqueSlug("persons", slug, id || null);
-        const payload = { name, slug: finalSlug, country, born_year, died_year, short_desc, bio, photo_url, updated_at: new Date().toISOString() };
-        let error;
-        if (id) { ({error} = await db.from("persons").update(payload).eq("id", id)); }
-        else { ({error} = await db.from("persons").insert([payload])); }
-        if (error) throw error;
-        showToast(id ? "Tokoh berhasil diperbarui ✓" : "Tokoh berhasil disimpan ✓");
-        resetPersonForm();
-        await loadPersons();
-        showTab("person-list");
-      } catch(err) { showToast("Gagal menyimpan: " + err.message, "error"); }
-      finally { btn.disabled = false; btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Tokoh"; }
-    }
-
-    function confirmDeletePerson(id) { personDeleteTargetId = id; document.getElementById("personConfirmOverlay").classList.add("open"); }
-    function closePersonConfirm() { personDeleteTargetId = null; document.getElementById("personConfirmOverlay").classList.remove("open"); }
-    document.getElementById("personConfirmYes").onclick = async () => {
-      if (!personDeleteTargetId) return;
-      try {
-        await db.from("article_persons").delete().eq("person_id", personDeleteTargetId);
-        const { error } = await db.from("persons").delete().eq("id", personDeleteTargetId);
-        if (error) throw error;
-        closePersonConfirm(); showToast("Tokoh berhasil dihapus"); loadPersons();
-      } catch(e) { showToast("Gagal menghapus: " + e.message, "error"); }
-    };
-
-    async function handlePersonPhotoUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      if (file.size > 5*1024*1024) { showToast("Ukuran file maks. 5MB", "error"); return; }
-      const progress = document.getElementById("personUploadProgress");
-      const bar = document.getElementById("personUploadProgressBar");
-      progress.style.display = "block"; bar.style.width = "30%";
-      try {
-        const ext = file.name.split(".").pop();
-        const fileName = `person-${Date.now()}.${ext}`;
-        bar.style.width = "60%";
-        const { error } = await db.storage.from("article-images").upload(fileName, file, { upsert: true });
-        if (error) throw error;
-        bar.style.width = "100%";
-        const { data: urlData } = db.storage.from("article-images").getPublicUrl(fileName);
-        document.getElementById("pPhotoUrl").value = urlData.publicUrl;
-        const img = document.getElementById("personPreviewImg"); img.src = urlData.publicUrl; img.style.display = "block";
-        showToast("Foto berhasil diupload ✓");
-      } catch(err) { showToast("Gagal upload: " + err.message, "error"); }
-      finally { setTimeout(() => { progress.style.display = "none"; bar.style.width = "0%"; }, 800); }
-    }
-
-    function previewPersonFromUrl() {
-      const url = document.getElementById("pPhotoUrl").value.trim();
-      const img = document.getElementById("personPreviewImg");
-      if (url) { img.src = url; img.style.display = "block"; } else { img.style.display = "none"; }
-    }
-
-    // ══════════════════════════════════════════════════════
-    // PERSON PICKER — ARTIKEL FORM
-    // ══════════════════════════════════════════════════════
-    function renderSelectedPersons() {
-      const container = document.getElementById("articlePersonSelected");
-      if (!selectedArticlePersons.length) {
-        container.innerHTML = '<span style="font-size:0.75rem;color:var(--text-muted);padding:2px">Belum ada tokoh yang dipilih</span>';
-        return;
-      }
-      container.innerHTML = selectedArticlePersons.map(p => `
-        <span class="person-tag">
-          ${p.photo_url ? `<img src="${p.photo_url}" onerror="this.style.display='none'" alt="">` : ""}
-          ${p.name}
-          <span class="remove-tag" onclick="removeSelectedPerson('${p.id}')">×</span>
-        </span>`).join("");
-    }
-
-    function removeSelectedPerson(id) {
-      selectedArticlePersons = selectedArticlePersons.filter(p => p.id !== id);
-      renderSelectedPersons();
-      filterPersonDropdown();
-    }
-
-    function showPersonDropdown() {
-      const dd = document.getElementById("articlePersonDropdown");
-      dd.style.display = "block";
-      filterPersonDropdown();
-    }
-
-    function filterPersonDropdown() {
-      const q = document.getElementById("articlePersonSearch").value.toLowerCase();
-      const dd = document.getElementById("articlePersonDropdown");
-      dd.style.display = "block";
-
-      if (!persons.length) {
-        dd.innerHTML = '<div class="person-picker-empty">Memuat daftar tokoh...</div>';
-        loadPersons().then(() => filterPersonDropdown());
-        return;
       }
 
-      const filtered = persons.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        (p.country||"").toLowerCase().includes(q)
-      );
-
-      if (!filtered.length) {
-        dd.innerHTML = '<div class="person-picker-empty">Tidak ada tokoh ditemukan.</div>';
-        return;
-      }
-
-      dd.innerHTML = filtered.map(p => {
-        const isSelected = selectedArticlePersons.some(sp => sp.id === p.id);
-        const lifespan = p.born_year ? (p.died_year ? `${p.born_year}–${p.died_year}` : `b. ${p.born_year}`) : "";
-        return `<div class="person-dropdown-item ${isSelected?'selected':''}" onclick="togglePersonSelection('${p.id}')">
-          ${p.photo_url ? `<img src="${p.photo_url}" onerror="this.style.display='none'" alt="">` : `<div style="width:32px;height:32px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:1rem">👤</div>`}
-          <div class="pdi-info">
-            <div class="pdi-name">${p.name}</div>
-            <div class="pdi-sub">${[p.country, lifespan].filter(Boolean).join(" · ")}</div>
-          </div>
-          ${isSelected ? '<span style="color:var(--gold);font-size:1rem">✓</span>' : ''}
-        </div>`;
-      }).join("");
-    }
-
-    function togglePersonSelection(id) {
-      const p = persons.find(x => x.id === id);
-      if (!p) return;
-      const idx = selectedArticlePersons.findIndex(sp => sp.id === id);
-      if (idx >= 0) { selectedArticlePersons.splice(idx, 1); }
-      else { selectedArticlePersons.push(p); }
-      renderSelectedPersons();
-      filterPersonDropdown();
-    }
-
-    // Close dropdown when clicking outside
-    document.addEventListener("click", e => {
-      const picker = document.getElementById("articlePersonPicker");
-      if (picker && !picker.contains(e.target)) {
-        document.getElementById("articlePersonDropdown").style.display = "none";
-      }
-    });
-
-    // ══════════════════════════════════════════════════════
-    // PERSON POPUP — klik nama di artikel
-    // ══════════════════════════════════════════════════════
-    async function openPersonPopup(nameOrSlug) {
-      const overlay = document.getElementById("personPopupOverlay");
-      overlay.style.display = "flex";
-      document.getElementById("personPopupHeader").innerHTML = '<div class="person-popup-banner-placeholder">⏳</div>';
-      document.getElementById("personPopupBody").innerHTML = '<div style="text-align:center;padding:1rem"><div class="spinner"></div></div>';
-
-      try {
-        let p = persons.find(x => x.name.toLowerCase() === nameOrSlug.toLowerCase() || x.slug === nameOrSlug);
-        if (!p) {
-          const { data } = await db.from("persons")
-            .select("*")
-            .or(`name.ilike.${nameOrSlug},slug.eq.${generateSlug(nameOrSlug)}`)
-            .limit(1);
-          p = data?.[0];
-        }
-        if (!p) {
-          document.getElementById("personPopupBody").innerHTML = `<p style="color:var(--text-muted);font-size:0.85rem">Tokoh "<strong>${nameOrSlug}</strong>" tidak ditemukan di database.</p>`;
+      async function saveArticle() {
+        const id = document.getElementById("editId").value;
+        const title = document.getElementById("fTitle").value.trim();
+        const content = document.getElementById("fContent").value.trim();
+        const excerpt = document.getElementById("fExcerpt").value.trim();
+        const image_url = document.getElementById("fImageUrl").value.trim();
+        const published = document.getElementById("fPublished").checked;
+        if (!title) {
+          showToast("Judul tidak boleh kosong", "error");
           return;
         }
-
-        const lifespan = p.born_year ? (p.died_year ? `${p.born_year} – ${p.died_year}` : `Lahir ${p.born_year}`) : null;
-
-        document.getElementById("personPopupHeader").innerHTML = p.photo_url
-          ? `<img class="person-popup-banner" src="${p.photo_url}" alt="${p.name}">
-             <img class="person-popup-avatar" src="${p.photo_url}" alt="${p.name}">`
-          : `<div class="person-popup-banner-placeholder">👤</div>
-             <div class="person-popup-avatar-placeholder">👤</div>`;
-
-        document.getElementById("personPopupBody").innerHTML = `
-          <div class="person-popup-name">${p.name}</div>
-          <div class="person-popup-meta">
-            ${lifespan ? `<span>📅 ${lifespan}</span>` : ""}
-            ${p.country ? `<span>🌍 ${p.country}</span>` : ""}
-          </div>
-          ${p.short_desc ? `<div class="person-popup-desc">${p.short_desc}</div>` : ""}
-          <button class="person-popup-btn" onclick="goToPersonProfile('${p.slug}')">Lihat Profil Lengkap →</button>`;
-
-        // Animate in
-        setTimeout(() => overlay.classList.add("open"), 10);
-      } catch(e) {
-        document.getElementById("personPopupBody").innerHTML = `<p style="color:var(--danger)">Error: ${e.message}</p>`;
+        if (!content) {
+          showToast("Isi artikel tidak boleh kosong", "error");
+          return;
+        }
+        if (!selectedTags.length) {
+          showToast("Tambahkan minimal satu tag", "error");
+          return;
+        }
+        const btn = document.getElementById("saveBtn");
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+        try {
+          const baseSlug = generateSlug(title);
+          const slug = await makeUniqueSlug(baseSlug, id || null);
+          const payload = {
+            title,
+            content,
+            excerpt,
+            image_url,
+            published,
+            slug,
+            updated_at: new Date().toISOString(),
+          };
+          let articleId = id;
+          if (id) {
+            const { error } = await db
+              .from("articles")
+              .update(payload)
+              .eq("id", id);
+            if (error) throw error;
+          } else {
+            const { data, error } = await db
+              .from("articles")
+              .insert([payload])
+              .select("id")
+              .single();
+            if (error) throw error;
+            articleId = data.id;
+          }
+          // Sync tags: delete existing then re-insert
+          await db.from("article_tags").delete().eq("article_id", articleId);
+          if (selectedTags.length) {
+            const rows = selectedTags.map((t) => ({
+              article_id: articleId,
+              tag_id: t.id,
+            }));
+            const { error } = await db.from("article_tags").insert(rows);
+            if (error) throw error;
+          }
+          showToast(
+            id
+              ? "Artikel berhasil diperbarui ✓"
+              : "Artikel berhasil disimpan ✓",
+          );
+          resetForm();
+          showTab("list");
+          document.querySelectorAll(".sb-nav a")[0].classList.add("active");
+          document.querySelectorAll(".sb-nav a")[1].classList.remove("active");
+        } catch (err) {
+          showToast("Gagal menyimpan: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Artikel";
+        }
       }
-    }
 
-    function goToPersonProfile(slug) {
-      window.open(`/tokoh/${slug}`, "_blank");
-    }
+      function confirmDelete(id) {
+        deleteTargetId = id;
+        document.getElementById("confirmOverlay").classList.add("open");
+      }
+      function closeConfirm() {
+        deleteTargetId = null;
+        document.getElementById("confirmOverlay").classList.remove("open");
+      }
+      document.getElementById("confirmYes").onclick = async () => {
+        if (!deleteTargetId) return;
+        try {
+          const { error } = await db
+            .from("articles")
+            .delete()
+            .eq("id", deleteTargetId);
+          if (error) throw error;
+          closeConfirm();
+          showToast("Artikel berhasil dihapus");
+          loadArticles();
+        } catch (e) {
+          showToast("Gagal menghapus: " + e.message, "error");
+        }
+      };
 
-    function closePersonPopup(e) {
-      if (e.target === document.getElementById("personPopupOverlay")) closePersonPopupDirect();
-    }
-    function closePersonPopupDirect() {
-      const overlay = document.getElementById("personPopupOverlay");
-      overlay.classList.remove("open");
-      setTimeout(() => { overlay.style.display = "none"; }, 250);
-    }
+      // ── TAG INPUT SYSTEM ──────────────────────────────────────────────
 
-    // ══════════════════════════════════════════════════════
-    // PERSON TAG RENDERER — konversi [person]...[/person] 
-    // ══════════════════════════════════════════════════════
-    function renderPersonTags(html) {
-      return html.replace(/\[person\](.*?)\[\/person\]/g, (match, name) => {
-        return `<span class="person-mention" onclick="openPersonPopup('${name.replace(/'/g,"\\'")}')">👤 ${name}</span>`;
+      async function loadAllTags() {
+        const { data } = await db
+          .from("tags")
+          .select("id,name,slug")
+          .order("name");
+        allTags = data || [];
+      }
+
+      function focusTagInput() {
+        document.getElementById("tagTextInput").focus();
+      }
+
+      function renderTagChips() {
+        const wrap = document.getElementById("tagChips");
+        wrap.innerHTML = selectedTags
+          .map(
+            (t) => `
+    <span class="tag-chip">
+      #${t.name}
+      <button class="remove-tag" onclick="removeTag('${t.id}')" title="Hapus tag">×</button>
+    </span>`,
+          )
+          .join("");
+      }
+
+      function removeTag(id) {
+        selectedTags = selectedTags.filter((t) => t.id !== id);
+        renderTagChips();
+      }
+
+      function renderTagDropdown(query) {
+        const ddList = document.getElementById("tagDdList");
+        const ddNew = document.getElementById("tagDdNew");
+        const ddEmpty = document.getElementById("tagDdEmpty");
+        const selectedIds = new Set(selectedTags.map((t) => t.id));
+        const q = query.toLowerCase().trim();
+        const filtered = allTags.filter(
+          (t) => t.name.toLowerCase().includes(q) && !selectedIds.has(t.id),
+        );
+        ddList.innerHTML = filtered
+          .map(
+            (t, i) => `
+    <div class="tag-dd-item" data-id="${t.id}" data-name="${t.name}" data-slug="${t.slug}"
+         onmousedown="selectTagFromDropdown('${t.id}','${t.name.replace(/'/g, "\\'")}','${t.slug}')">
+      <span>#${t.name}</span>
+    </div>`,
+          )
+          .join("");
+        // Show "buat tag baru" if query doesn't exactly match any tag
+        const exactMatch = allTags.some((t) => t.name.toLowerCase() === q);
+        if (q && !exactMatch) {
+          ddNew.textContent = `+ Buat tag baru: "${query}"`;
+          ddNew.className = "tag-dd-new show";
+        } else {
+          ddNew.className = "tag-dd-new";
+        }
+        ddEmpty.className =
+          filtered.length === 0 && (!q || exactMatch)
+            ? "tag-dd-empty show"
+            : "tag-dd-empty";
+        document.getElementById("tagDropdown").classList.add("open");
+      }
+
+      function selectTagFromDropdown(id, name, slug) {
+        if (!selectedTags.find((t) => t.id === id)) {
+          selectedTags.push({ id, name, slug });
+          renderTagChips();
+        }
+        document.getElementById("tagTextInput").value = "";
+        document.getElementById("tagDropdown").classList.remove("open");
+      }
+
+      async function createAndAddTag() {
+        const name = document.getElementById("tagTextInput").value.trim();
+        if (!name) return;
+        const slug = generateSlug(name);
+        try {
+          // Check if slug already exists
+          const { data: existing } = await db
+            .from("tags")
+            .select("id,name,slug")
+            .eq("slug", slug)
+            .single();
+          if (existing) {
+            selectTagFromDropdown(existing.id, existing.name, existing.slug);
+            return;
+          }
+          const { data, error } = await db
+            .from("tags")
+            .insert([{ name, slug }])
+            .select("id,name,slug")
+            .single();
+          if (error) throw error;
+          allTags.push(data);
+          allTags.sort((a, b) => a.name.localeCompare(b.name));
+          selectTagFromDropdown(data.id, data.name, data.slug);
+          showToast(`Tag "${name}" berhasil dibuat ✓`);
+        } catch (err) {
+          showToast("Gagal membuat tag: " + err.message, "error");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const input = document.getElementById("tagTextInput");
+        if (!input) return;
+        input.addEventListener("input", () => renderTagDropdown(input.value));
+        input.addEventListener("focus", () => renderTagDropdown(input.value));
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            createAndAddTag();
+          }
+          if (e.key === "Escape")
+            document.getElementById("tagDropdown").classList.remove("open");
+        });
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest("#tagInputWrap"))
+            document.getElementById("tagDropdown").classList.remove("open");
+        });
+        loadAllTags();
       });
-    }
 
-    // ══════════════════════════════════════════════════════
-    // KEYBOARD SHORTCUTS
-    // ══════════════════════════════════════════════════════
-    document.addEventListener("keydown", e => {
-      if (e.key === "Escape") {
-        closeConfirm();
-        closeHConfirm();
-        closePersonConfirm();
-        closePersonPopupDirect();
+      // ── SEJARAH HARI INI ─────────────────────────────────────────────
+
+      let historyItems = [];
+
+      function showHistoryForm() {
+        resetHistoryForm();
+        document.getElementById("historyFormPanel").style.display = "block";
+        document
+          .getElementById("historyFormPanel")
+          .scrollIntoView({ behavior: "smooth" });
       }
-    });
+      function hideHistoryForm() {
+        document.getElementById("historyFormPanel").style.display = "none";
+        resetHistoryForm();
+      }
+      function resetHistoryForm() {
+        [
+          "hEditId",
+          "hTitle",
+          "hHistDate",
+          "hExcerpt",
+          "hContent",
+          "hExpiresAt",
+        ].forEach((id) => (document.getElementById(id).value = ""));
+        document.getElementById("hPublished").checked = true;
+        document.getElementById("historyFormTitle").textContent =
+          "Tambah Artikel Sejarah Hari Ini";
+        document.getElementById("hSaveBtn").textContent =
+          "💾 Simpan Artikel Harian";
+      }
 
-    // ══════════════════════════════════════════════════════
-    // INIT
-    // ══════════════════════════════════════════════════════
-    loadArticles();
-    loadPersons(); // preload persons for picker
+      async function loadHistory() {
+        const tbody = document.getElementById("historyTableBody");
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="no-data"><div class="spinner"></div></td></tr>';
+        try {
+          const { data, error } = await db
+            .from("daily_history")
+            .select("*")
+            .order("created_at", { ascending: false });
+          if (error) throw error;
+          historyItems = data || [];
+          if (!historyItems.length) {
+            tbody.innerHTML =
+              '<tr><td colspan="6" class="no-data">Belum ada artikel Sejarah Hari Ini.</td></tr>';
+            return;
+          }
+          const now = new Date();
+          tbody.innerHTML = historyItems
+            .map((h) => {
+              const expired = new Date(h.expires_at) < now;
+              const statusBadge = !h.published
+                ? '<span class="badge badge-draft">Draft</span>'
+                : expired
+                  ? '<span class="badge" style="background:rgba(192,57,43,.2);color:#c0392b">Expired</span>'
+                  : '<span class="badge badge-published">Live</span>';
+              return `<tr style="${expired ? "opacity:.55" : ""}">
+        <td class="td-title">${h.title}<small>${h.hist_date || ""}</small></td>
+        <td style="font-size:.78rem;color:var(--text-muted);max-width:200px">${(h.excerpt || "").slice(0, 80)}${h.excerpt && h.excerpt.length > 80 ? "…" : ""}</td>
+        <td>${statusBadge}</td>
+        <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(h.created_at)}</td>
+        <td style="font-size:.75rem;color:${expired ? "var(--danger)" : "var(--text-muted)"}">${formatDate(h.expires_at)}<br><small style="font-size:.65rem">${formatTime(h.expires_at)}</small></td>
+        <td><div class="td-actions"><button class="btn-edit" onclick="editHistory('${h.id}')">✏️ Edit</button><button class="btn-danger" onclick="confirmDeleteHistory('${h.id}')">🗑</button></div></td>
+      </tr>`;
+            })
+            .join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="6" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
+        }
+      }
+
+      function editHistory(id) {
+        const h = historyItems.find((x) => x.id === id);
+        if (!h) return;
+        document.getElementById("hEditId").value = h.id;
+        document.getElementById("hTitle").value = h.title || "";
+        document.getElementById("hHistDate").value = h.hist_date || "";
+        document.getElementById("hExcerpt").value = h.excerpt || "";
+        document.getElementById("hContent").value = h.content || "";
+        document.getElementById("hPublished").checked = h.published || false;
+        document.getElementById("hExpiresAt").value = h.expires_at
+          ? new Date(h.expires_at).toLocaleString("id-ID")
+          : "";
+        document.getElementById("historyFormTitle").textContent =
+          "Edit Artikel Sejarah Hari Ini";
+        document.getElementById("hSaveBtn").textContent = "💾 Simpan Perubahan";
+        document.getElementById("historyFormPanel").style.display = "block";
+        document
+          .getElementById("historyFormPanel")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+
+      async function saveHistory() {
+        const id = document.getElementById("hEditId").value;
+        const title = document.getElementById("hTitle").value.trim();
+        const hist_date = document.getElementById("hHistDate").value.trim();
+        const excerpt = document.getElementById("hExcerpt").value.trim();
+        const content = document.getElementById("hContent").value.trim();
+        const published = document.getElementById("hPublished").checked;
+        if (!title) {
+          showToast("Judul tidak boleh kosong", "error");
+          return;
+        }
+        if (!hist_date) {
+          showToast("Tanggal historis tidak boleh kosong", "error");
+          return;
+        }
+        if (!excerpt) {
+          showToast("Ringkasan tidak boleh kosong", "error");
+          return;
+        }
+        const btn = document.getElementById("hSaveBtn");
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+        try {
+          const now = new Date();
+          const expires_at = id
+            ? historyItems.find((x) => x.id === id)?.expires_at
+            : new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString();
+          const payload = {
+            title,
+            hist_date,
+            excerpt,
+            content,
+            published,
+            updated_at: now.toISOString(),
+          };
+          if (!id) payload.expires_at = expires_at;
+          let error;
+          if (id) {
+            ({ error } = await db
+              .from("daily_history")
+              .update(payload)
+              .eq("id", id));
+          } else {
+            ({ error } = await db
+              .from("daily_history")
+              .insert([{ ...payload, expires_at }]));
+          }
+          if (error) throw error;
+          showToast(
+            id
+              ? "Artikel harian diperbarui ✓"
+              : "Artikel harian disimpan ✓ (aktif 24 jam)",
+          );
+          hideHistoryForm();
+          loadHistory();
+        } catch (err) {
+          showToast("Gagal menyimpan: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = id
+            ? "💾 Simpan Perubahan"
+            : "💾 Simpan Artikel Harian";
+        }
+      }
+
+      function confirmDeleteHistory(id) {
+        hDeleteTargetId = id;
+        document.getElementById("hConfirmOverlay").classList.add("open");
+      }
+      function closeHConfirm() {
+        hDeleteTargetId = null;
+        document.getElementById("hConfirmOverlay").classList.remove("open");
+      }
+      document.getElementById("hConfirmYes").onclick = async () => {
+        if (!hDeleteTargetId) return;
+        try {
+          const { error } = await db
+            .from("daily_history")
+            .delete()
+            .eq("id", hDeleteTargetId);
+          if (error) throw error;
+          closeHConfirm();
+          showToast("Artikel harian dihapus");
+          loadHistory();
+        } catch (e) {
+          showToast("Gagal menghapus: " + e.message, "error");
+        }
+      };
+
+      // ── KELOLA TAG ────────────────────────────────────────────────────
+
+      let managedTags = [];
+
+      async function loadTagsTable() {
+        const tbody = document.getElementById("tagTableBody");
+        tbody.innerHTML =
+          '<tr><td colspan="6" class="no-data"><div class="spinner"></div></td></tr>';
+        try {
+          const { data, error } = await db.from("popular_tags").select("*");
+          if (error) {
+            // Fallback if view doesn't exist yet
+            const { data: d2, error: e2 } = await db
+              .from("tags")
+              .select("*, article_tags(article_id)")
+              .order("name");
+            if (e2) throw e2;
+            managedTags = (d2 || []).map((t) => ({
+              ...t,
+              article_count: (t.article_tags || []).length,
+            }));
+          } else {
+            managedTags = data || [];
+          }
+          if (!managedTags.length) {
+            tbody.innerHTML =
+              '<tr><td colspan="6" class="no-data">Belum ada tag. Klik "+ Tambah Tag Baru" untuk mulai.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = managedTags
+            .map(
+              (t) => `
+      <tr>
+        <td><span style="font-weight:500;color:#fff">${t.name}</span></td>
+        <td style="font-family:monospace;font-size:.72rem;color:var(--gold)">${t.slug}</td>
+        <td style="font-size:.78rem;color:var(--text-muted);max-width:220px">${t.description || '<span style="opacity:.4">—</span>'}</td>
+        <td><span style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold)">${t.article_count || 0}</span> <span style="font-size:.7rem;color:var(--text-muted)">artikel</span></td>
+        <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(t.created_at)}</td>
+        <td><div class="td-actions"><button class="btn-edit" onclick="editTag('${t.id}')">✏️ Edit</button><button class="btn-danger" onclick="confirmDeleteTag('${t.id}')">🗑</button></div></td>
+      </tr>`,
+            )
+            .join("");
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="6" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
+        }
+      }
+
+      function showTagForm() {
+        resetTagForm();
+        document.getElementById("tagFormPanel").style.display = "block";
+      }
+      function hideTagForm() {
+        document.getElementById("tagFormPanel").style.display = "none";
+        resetTagForm();
+      }
+      function resetTagForm() {
+        document.getElementById("tEditId").value = "";
+        document.getElementById("tName").value = "";
+        document.getElementById("tSlug").value = "";
+        document.getElementById("tDesc").value = "";
+        document.getElementById("tagFormTitle").textContent = "Tambah Tag Baru";
+        document.getElementById("tSaveBtn").textContent = "💾 Simpan Tag";
+      }
+      function updateTagSlugPreview() {
+        document.getElementById("tSlug").value = generateSlug(
+          document.getElementById("tName").value,
+        );
+      }
+      function editTag(id) {
+        const t = managedTags.find((x) => x.id === id);
+        if (!t) return;
+        document.getElementById("tEditId").value = t.id;
+        document.getElementById("tName").value = t.name || "";
+        document.getElementById("tSlug").value = t.slug || "";
+        document.getElementById("tDesc").value = t.description || "";
+        document.getElementById("tagFormTitle").textContent = "Edit Tag";
+        document.getElementById("tSaveBtn").textContent = "💾 Simpan Perubahan";
+        document.getElementById("tagFormPanel").style.display = "block";
+        document
+          .getElementById("tagFormPanel")
+          .scrollIntoView({ behavior: "smooth" });
+      }
+      async function saveTag() {
+        const id = document.getElementById("tEditId").value;
+        const name = document.getElementById("tName").value.trim();
+        const slug =
+          document.getElementById("tSlug").value.trim() || generateSlug(name);
+        const description = document.getElementById("tDesc").value.trim();
+        if (!name) {
+          showToast("Nama tag tidak boleh kosong", "error");
+          return;
+        }
+        const btn = document.getElementById("tSaveBtn");
+        btn.disabled = true;
+        btn.textContent = "Menyimpan...";
+        try {
+          const payload = { name, slug, description };
+          if (id) {
+            const { error } = await db
+              .from("tags")
+              .update(payload)
+              .eq("id", id);
+            if (error) throw error;
+          } else {
+            const { error } = await db.from("tags").insert([payload]);
+            if (error) throw error;
+          }
+          showToast(id ? "Tag berhasil diperbarui ✓" : "Tag berhasil dibuat ✓");
+          hideTagForm();
+          loadTagsTable();
+          await loadAllTags();
+        } catch (err) {
+          showToast("Gagal menyimpan: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Tag";
+        }
+      }
+      function confirmDeleteTag(id) {
+        tagDeleteTargetId = id;
+        document.getElementById("tagConfirmOverlay").classList.add("open");
+      }
+      function closeTagConfirm() {
+        tagDeleteTargetId = null;
+        document.getElementById("tagConfirmOverlay").classList.remove("open");
+      }
+      document.getElementById("tagConfirmYes").onclick = async () => {
+        if (!tagDeleteTargetId) return;
+        try {
+          const { error } = await db
+            .from("tags")
+            .delete()
+            .eq("id", tagDeleteTargetId);
+          if (error) throw error;
+          closeTagConfirm();
+          showToast("Tag berhasil dihapus");
+          loadTagsTable();
+          await loadAllTags();
+        } catch (e) {
+          showToast("Gagal menghapus: " + e.message, "error");
+        }
+      };
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeConfirm();
+          closeHConfirm();
+          closeTagConfirm();
+        }
+      });
+
+      // INIT
+      loadArticles();
     </script>
   </body>
 </html>
