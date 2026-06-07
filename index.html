@@ -774,6 +774,18 @@
       </div>
     </div>
 
+    <!-- CONFIRM: Hapus Konten Sosial -->
+    <div class="confirm-overlay" id="scConfirmOverlay">
+      <div class="confirm-box">
+        <h3>Hapus Konten Sosial?</h3>
+        <p>Konten ini akan dihapus permanen dari database. Tindakan ini tidak bisa dibatalkan.</p>
+        <div class="confirm-btns">
+          <button class="btn-danger" id="scConfirmYes">Ya, Hapus</button>
+          <button class="btn-secondary" onclick="closeScConfirm()">Batal</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <!-- SIDEBAR -->
@@ -799,6 +811,9 @@
         >
         <a href="#" onclick="showTab('tags', this)"
           ><span class="icon">🏷️</span><span>Kelola Tag</span></a
+        >
+        <a href="#" onclick="showTab('social', this)"
+          ><span class="icon">📱</span><span>Konten Sosial</span></a
         >
         <div class="sb-nav-label">Lainnya</div>
         <a href="index.html" target="_blank"
@@ -1269,9 +1284,102 @@
             </table>
           </div>
         </div>
-      </div>
-      <!-- /content -->
-    </div>
+        <!-- TAB: KONTEN SOSIAL -->
+        <div class="tab-content" id="tab-social">
+          <div class="page-header">
+            <h2>Konten Sosial</h2>
+            <button class="btn-primary" onclick="showScForm()">+ Tambah Konten</button>
+          </div>
+
+          <!-- Form Panel -->
+          <div class="form-panel" id="scFormPanel" style="display:none;margin-bottom:1.5rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+              <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff" id="scFormTitle">Tambah Konten Sosial</h3>
+              <button class="btn-secondary" onclick="hideScForm()">✕ Tutup</button>
+            </div>
+            <input type="hidden" id="scEditId" />
+            <div class="form-grid">
+              <div class="form-row" style="grid-column:1/-1">
+                <label>Judul Konten *</label>
+                <input type="text" id="scTitle" placeholder="Masukkan judul konten..." />
+              </div>
+              <div class="form-row">
+                <label>Platform *</label>
+                <select id="scPlatform">
+                  <option value="">— Pilih Platform —</option>
+                  <option value="TikTok">TikTok</option>
+                  <option value="Instagram">Instagram</option>
+                  <option value="YouTube">YouTube</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>Tanggal Publikasi *</label>
+                <input type="date" id="scPublishedAt" />
+              </div>
+              <div class="form-row" style="grid-column:1/-1">
+                <label>URL Konten *</label>
+                <input type="url" id="scContentUrl" placeholder="https://www.tiktok.com/@..." />
+                <div class="hint">URL lengkap ke postingan TikTok, Instagram, atau YouTube.</div>
+              </div>
+              <div class="form-row" style="grid-column:1/-1">
+                <label>URL Thumbnail</label>
+                <input type="url" id="scThumbnailUrl" placeholder="https://..." oninput="previewScThumb()" />
+                <div class="hint">URL gambar thumbnail yang akan ditampilkan di kartu konten.</div>
+                <img id="scThumbPreview" class="preview-img" alt="Preview Thumbnail" />
+              </div>
+            </div>
+            <div class="publish-row">
+              <div style="display:flex;align-items:center;gap:10px">
+                <label style="font-size:.68rem;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:0">Status</label>
+                <select id="scStatus" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.82rem;padding:8px 12px;outline:none;border-radius:0;width:auto">
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                </select>
+              </div>
+              <div style="margin-left:auto;display:flex;gap:10px">
+                <button class="btn-secondary" onclick="resetScForm()">Reset</button>
+                <button class="btn-primary" onclick="saveSocialContent()" id="scSaveBtn">💾 Simpan Konten</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter bar -->
+          <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
+            <select id="scFilterPlatform" onchange="loadSocialContents()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:8px 14px;outline:none;border-radius:0">
+              <option value="">Semua Platform</option>
+              <option value="TikTok">TikTok</option>
+              <option value="Instagram">Instagram</option>
+              <option value="YouTube">YouTube</option>
+            </select>
+            <select id="scFilterStatus" onchange="loadSocialContents()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:8px 14px;outline:none;border-radius:0">
+              <option value="">Semua Status</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+            </select>
+          </div>
+
+          <!-- Table -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Thumbnail</th>
+                  <th>Judul</th>
+                  <th>Platform</th>
+                  <th>URL</th>
+                  <th>Tanggal Publikasi</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="scTableBody">
+                <tr><td colspan="7" class="no-data"><div class="spinner"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /content -->
     <!-- /main -->
 
     <script>
@@ -1367,25 +1475,22 @@
       // ── TABS ─────────────────────────────────────────────────────────
 
       function showTab(name, el) {
-        document
-          .querySelectorAll(".tab-content")
-          .forEach((t) => t.classList.remove("active"));
-        document
-          .querySelectorAll(".sb-nav a")
-          .forEach((a) => a.classList.remove("active"));
+        document.querySelectorAll(".tab-content").forEach((t) => t.classList.remove("active"));
+        document.querySelectorAll(".sb-nav a").forEach((a) => a.classList.remove("active"));
         document.getElementById("tab-" + name).classList.add("active");
         const titles = {
           list: "Daftar Artikel",
           create: "Buat Artikel",
           history: "Sejarah Hari Ini",
           tags: "Kelola Tag",
+          social: "Konten Sosial",
         };
-        document.getElementById("topbarTitle").textContent =
-          titles[name] || name;
+        document.getElementById("topbarTitle").textContent = titles[name] || name;
         if (el) el.classList.add("active");
         if (name === "list") loadArticles();
         if (name === "history") loadHistory();
         if (name === "tags") loadTagsTable();
+        if (name === "social") loadSocialContents();
       }
 
       // ── ARTICLES ─────────────────────────────────────────────────────
@@ -1586,31 +1691,14 @@
             published,
             slug,
             updated_at: new Date().toISOString(),
-            // TODO: Setelah migrasi selesai, jalankan perintah ini di Supabase SQL Editor:
-            //   ALTER TABLE articles ALTER COLUMN category DROP NOT NULL;
-            // lalu hapus baris category di bawah ini.
-            category: "umum",
           };
-
-          // Pastikan articleId bertipe yang sama dengan kolom id di DB.
-          // Input dari hidden field selalu string — konversi ke number jika
-          // id terlihat numerik, atau biarkan sebagai string (untuk UUID).
-          const rawId = id ? id.trim() : "";
-          const numericId = rawId !== "" && /^\d+$/.test(rawId) ? Number(rawId) : rawId || null;
-
-          let articleId = numericId;
-
-          if (numericId) {
-            // UPDATE: pakai .select() agar dapat konfirmasi ID dari DB
-            const { data, error } = await db
+          let articleId = id;
+          if (id) {
+            const { error } = await db
               .from("articles")
               .update(payload)
-              .eq("id", numericId)
-              .select("id")
-              .single();
+              .eq("id", id);
             if (error) throw error;
-            // Gunakan ID yang dikembalikan DB — bukan dari input field
-            articleId = data.id;
           } else {
             const { data, error } = await db
               .from("articles")
@@ -1618,11 +1706,8 @@
               .select("id")
               .single();
             if (error) throw error;
-            // Artikel baru: ID berasal dari DB setelah insert berhasil
             articleId = data.id;
           }
-
-          // articleId sekarang dijamin valid dari DB sebelum insert ke article_tags
           // Sync tags: delete existing then re-insert
           await db.from("article_tags").delete().eq("article_id", articleId);
           if (selectedTags.length) {
@@ -2127,8 +2212,168 @@
           closeConfirm();
           closeHConfirm();
           closeTagConfirm();
+          closeScConfirm();
         }
       });
+
+      // ── KONTEN SOSIAL ─────────────────────────────────────────────────
+
+      let socialContents = [];
+      let scDeleteTargetId = null;
+
+      const platformIcons = { TikTok: "🎵", Instagram: "📸", YouTube: "▶️" };
+      const platformColors = {
+        TikTok: "#69C9D0",
+        Instagram: "#E1306C",
+        YouTube: "#FF0000",
+      };
+
+      async function loadSocialContents() {
+        const tbody = document.getElementById("scTableBody");
+        tbody.innerHTML = '<tr><td colspan="7" class="no-data"><div class="spinner"></div></td></tr>';
+        try {
+          let q = db.from("social_contents").select("*").order("published_at", { ascending: false });
+          const pf = document.getElementById("scFilterPlatform").value;
+          const st = document.getElementById("scFilterStatus").value;
+          if (pf) q = q.eq("platform", pf);
+          if (st) q = q.eq("status", st);
+          const { data, error } = await q;
+          if (error) throw error;
+          socialContents = data || [];
+          if (!socialContents.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="no-data">Belum ada konten sosial. Klik "+ Tambah Konten" untuk mulai.</td></tr>';
+            return;
+          }
+          tbody.innerHTML = socialContents.map((c) => `
+            <tr>
+              <td>
+                ${c.thumbnail_url
+                  ? `<img class="td-thumb" src="${c.thumbnail_url}" onerror="this.style.display='none'" alt="" />`
+                  : `<div style="width:52px;height:40px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.2rem">${platformIcons[c.platform] || "📷"}</div>`}
+              </td>
+              <td class="td-title">${c.title}</td>
+              <td>
+                <span style="display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:600;color:${platformColors[c.platform] || "var(--gold)"}">
+                  ${platformIcons[c.platform] || ""} ${c.platform}
+                </span>
+              </td>
+              <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+                <a href="${c.content_url}" target="_blank" style="color:var(--gold);font-size:.75rem;text-decoration:none" title="${c.content_url}">↗ Buka</a>
+              </td>
+              <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(c.published_at)}</td>
+              <td><span class="badge ${c.status === 'published' ? 'badge-published' : 'badge-draft'}">${c.status === 'published' ? 'Published' : 'Draft'}</span></td>
+              <td><div class="td-actions">
+                <button class="btn-edit" onclick="editSocialContent('${c.id}')">✏️ Edit</button>
+                <button class="btn-danger" onclick="confirmDeleteSc('${c.id}')">🗑</button>
+              </div></td>
+            </tr>`).join("");
+          setStatus(true);
+        } catch (e) {
+          tbody.innerHTML = `<tr><td colspan="7" class="no-data">⚠️ Gagal memuat: ${e.message}</td></tr>`;
+          setStatus(false);
+        }
+      }
+
+      function showScForm() {
+        resetScForm();
+        document.getElementById("scFormPanel").style.display = "block";
+        document.getElementById("scFormPanel").scrollIntoView({ behavior: "smooth" });
+      }
+      function hideScForm() {
+        document.getElementById("scFormPanel").style.display = "none";
+        resetScForm();
+      }
+      function resetScForm() {
+        document.getElementById("scEditId").value = "";
+        document.getElementById("scTitle").value = "";
+        document.getElementById("scPlatform").value = "";
+        document.getElementById("scThumbnailUrl").value = "";
+        document.getElementById("scContentUrl").value = "";
+        document.getElementById("scPublishedAt").value = "";
+        document.getElementById("scStatus").value = "published";
+        document.getElementById("scThumbPreview").style.display = "none";
+        document.getElementById("scFormTitle").textContent = "Tambah Konten Sosial";
+        document.getElementById("scSaveBtn").textContent = "💾 Simpan Konten";
+      }
+      function previewScThumb() {
+        const url = document.getElementById("scThumbnailUrl").value.trim();
+        const img = document.getElementById("scThumbPreview");
+        if (url) { img.src = url; img.style.display = "block"; }
+        else img.style.display = "none";
+      }
+      function editSocialContent(id) {
+        const c = socialContents.find((x) => x.id === id);
+        if (!c) return;
+        document.getElementById("scEditId").value = c.id;
+        document.getElementById("scTitle").value = c.title || "";
+        document.getElementById("scPlatform").value = c.platform || "";
+        document.getElementById("scThumbnailUrl").value = c.thumbnail_url || "";
+        document.getElementById("scContentUrl").value = c.content_url || "";
+        document.getElementById("scPublishedAt").value = c.published_at ? c.published_at.substring(0, 10) : "";
+        document.getElementById("scStatus").value = c.status || "published";
+        if (c.thumbnail_url) {
+          const img = document.getElementById("scThumbPreview");
+          img.src = c.thumbnail_url; img.style.display = "block";
+        }
+        document.getElementById("scFormTitle").textContent = "Edit Konten Sosial";
+        document.getElementById("scSaveBtn").textContent = "💾 Simpan Perubahan";
+        document.getElementById("scFormPanel").style.display = "block";
+        document.getElementById("scFormPanel").scrollIntoView({ behavior: "smooth" });
+      }
+      async function saveSocialContent() {
+        const id = document.getElementById("scEditId").value;
+        const title = document.getElementById("scTitle").value.trim();
+        const platform = document.getElementById("scPlatform").value;
+        const thumbnail_url = document.getElementById("scThumbnailUrl").value.trim();
+        const content_url = document.getElementById("scContentUrl").value.trim();
+        const published_at = document.getElementById("scPublishedAt").value;
+        const status = document.getElementById("scStatus").value;
+        if (!title) { showToast("Judul tidak boleh kosong", "error"); return; }
+        if (!platform) { showToast("Pilih platform terlebih dahulu", "error"); return; }
+        if (!content_url) { showToast("URL konten tidak boleh kosong", "error"); return; }
+        if (!published_at) { showToast("Tanggal publikasi harus diisi", "error"); return; }
+        const btn = document.getElementById("scSaveBtn");
+        btn.disabled = true; btn.textContent = "Menyimpan...";
+        try {
+          const now = new Date().toISOString();
+          const payload = { title, platform, thumbnail_url: thumbnail_url || null, content_url, published_at, status, updated_at: now };
+          let error;
+          if (id) {
+            ({ error } = await db.from("social_contents").update(payload).eq("id", id));
+          } else {
+            ({ error } = await db.from("social_contents").insert([{ ...payload, created_at: now }]));
+          }
+          if (error) throw error;
+          showToast(id ? "Konten sosial diperbarui ✓" : "Konten sosial ditambahkan ✓");
+          hideScForm();
+          loadSocialContents();
+        } catch (err) {
+          showToast("Gagal menyimpan: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Konten";
+        }
+      }
+      function confirmDeleteSc(id) {
+        scDeleteTargetId = id;
+        document.getElementById("scConfirmOverlay").classList.add("open");
+      }
+      function closeScConfirm() {
+        scDeleteTargetId = null;
+        document.getElementById("scConfirmOverlay").classList.remove("open");
+      }
+      document.getElementById("scConfirmYes").onclick = async () => {
+        if (!scDeleteTargetId) return;
+        try {
+          const { error } = await db.from("social_contents").delete().eq("id", scDeleteTargetId);
+          if (error) throw error;
+          closeScConfirm();
+          showToast("Konten sosial dihapus");
+          loadSocialContents();
+        } catch (e) {
+          showToast("Gagal menghapus: " + e.message, "error");
+        }
+      };
 
       // INIT
       loadArticles();
