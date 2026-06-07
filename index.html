@@ -707,6 +707,89 @@
         display: block;
       }
 
+      /* ── MULTI IMAGE ITEM ── */
+      .multi-img-item {
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        padding: 0.85rem 1rem;
+        display: grid;
+        grid-template-columns: 80px 1fr auto;
+        gap: 0.85rem;
+        align-items: flex-start;
+      }
+      .multi-img-item .img-thumb {
+        width: 80px;
+        height: 56px;
+        object-fit: cover;
+        border: 1px solid var(--border);
+        display: block;
+        flex-shrink: 0;
+      }
+      .multi-img-item .img-info {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .multi-img-item .img-label {
+        font-size: 0.68rem;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--gold);
+        font-weight: 600;
+      }
+      .multi-img-item .img-caption-input {
+        width: 100%;
+        background: var(--surface3);
+        border: 1px solid var(--border);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.82rem;
+        padding: 7px 10px;
+        outline: none;
+        border-radius: 0;
+        transition: border-color 0.2s;
+      }
+      .multi-img-item .img-caption-input:focus {
+        border-color: var(--gold);
+      }
+      .multi-img-item .img-caption-input::placeholder {
+        color: var(--text-muted);
+        font-size: 0.78rem;
+      }
+      .multi-img-item .img-url-text {
+        font-size: 0.68rem;
+        color: var(--text-muted);
+        font-family: monospace;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 100%;
+      }
+      .multi-img-item .img-tag-badge {
+        display: inline-block;
+        background: var(--surface3);
+        border: 1px solid rgba(201, 151, 43, 0.3);
+        color: var(--gold-light);
+        font-family: monospace;
+        font-size: 0.75rem;
+        padding: 2px 7px;
+      }
+      .multi-img-item .btn-remove-img {
+        background: none;
+        border: 1px solid rgba(192, 57, 43, 0.4);
+        color: var(--danger);
+        font-size: 0.72rem;
+        padding: 5px 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+        align-self: flex-start;
+      }
+      .multi-img-item .btn-remove-img:hover {
+        background: rgba(192, 57, 43, 0.15);
+      }
+
       @media (max-width: 900px) {
         .sidebar {
           width: 60px;
@@ -981,34 +1064,29 @@
             </div>
             <div class="form-row">
               <label>Upload Gambar Artikel</label>
-              <div
-                class="upload-zone"
-                onclick="document.getElementById('fImageFile').click()"
-              >
-                <input
-                  type="file"
-                  id="fImageFile"
-                  accept="image/*"
-                  onchange="handleImageUpload(event)"
-                />
-                <div class="uz-icon">🖼️</div>
-                <p><strong>Klik untuk upload gambar</strong></p>
-                <p>JPG, PNG, WEBP — maks. 5MB</p>
+              <div style="background:var(--surface3);border:1px solid var(--border);padding:1rem;margin-bottom:0.5rem;font-size:0.75rem;color:var(--text-muted);line-height:1.7">
+                📌 <strong style="color:var(--gold)">Cara pakai multi-gambar:</strong>
+                Upload beberapa gambar di bawah. Gunakan <code style="background:var(--surface);padding:1px 5px;color:var(--gold-light);font-size:0.8rem">[image1]</code>, <code style="background:var(--surface);padding:1px 5px;color:var(--gold-light);font-size:0.8rem">[image2]</code>, dst. di dalam isi artikel untuk menentukan posisi gambar. Angka menunjukkan gambar ke berapa yang muncul.
               </div>
-              <div class="upload-progress" id="uploadProgress">
+
+              <!-- Drop zone multi upload -->
+              <div class="upload-zone" id="multiUploadZone" onclick="document.getElementById('fImageFiles').click()" style="margin-bottom:0">
+                <input type="file" id="fImageFiles" accept="image/*" multiple onchange="handleMultiImageUpload(event)" />
+                <div class="uz-icon">🖼️</div>
+                <p><strong>Klik untuk upload gambar</strong> (boleh lebih dari satu)</p>
+                <p>JPG, PNG, WEBP — maks. 5MB per gambar</p>
+              </div>
+              <div class="upload-progress" id="uploadProgress" style="margin-top:6px">
                 <div class="upload-progress-bar" id="uploadProgressBar"></div>
               </div>
-              <img id="previewImg" class="preview-img" alt="Preview" />
-              <div class="hint" style="margin-top: 8px">
-                Atau masukkan URL gambar langsung:
-              </div>
-              <input
-                type="text"
-                id="fImageUrl"
-                placeholder="https://..."
-                oninput="previewFromUrl()"
-                style="margin-top: 6px"
-              />
+              <div id="uploadStatusText" style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;display:none"></div>
+
+              <!-- Daftar gambar yang sudah diupload -->
+              <div id="multiImageList" style="margin-top:1rem;display:flex;flex-direction:column;gap:0.75rem"></div>
+
+              <!-- Input URL manual untuk gambar pertama (tetap ada untuk kompatibilitas) -->
+              <div class="hint" style="margin-top: 10px">Atau masukkan URL gambar pertama langsung:</div>
+              <input type="text" id="fImageUrl" placeholder="https://..." oninput="syncUrlToImageList()" style="margin-top: 6px" />
             </div>
             <div class="publish-row">
               <label class="toggle"
@@ -1393,6 +1471,7 @@
       let articles = [];
       let allTags = [];
       let selectedTags = []; // array of {id, name, slug}
+      let articleImages = []; // array of {url, caption}
       let deleteTargetId = null;
       let hDeleteTargetId = null;
       let tagDeleteTargetId = null;
@@ -1554,11 +1633,20 @@
         slugPrev.textContent =
           "/artikel/" + (a.slug || generateSlug(a.title || ""));
         slugPrev.style.display = "block";
-        if (a.image_url) {
-          const img = document.getElementById("previewImg");
-          img.src = a.image_url;
-          img.style.display = "block";
+
+        // Load multi images dari field images (JSON) atau fallback ke image_url
+        articleImages = [];
+        if (a.images && Array.isArray(a.images) && a.images.length) {
+          articleImages = a.images.map(img =>
+            typeof img === "string"
+              ? { url: img, caption: "" }
+              : { url: img.url || "", caption: img.caption || "" }
+          );
+        } else if (a.image_url) {
+          articleImages = [{ url: a.image_url, caption: "" }];
         }
+        renderMultiImageList();
+
         // Set selected tags
         selectedTags = (a.tags || []).map((t) => ({
           id: t.id,
@@ -1580,62 +1668,111 @@
         document.getElementById("fContent").value = "";
         document.getElementById("fImageUrl").value = "";
         document.getElementById("fPublished").checked = false;
-        document.getElementById("previewImg").style.display = "none";
         document.getElementById("slugPreview").style.display = "none";
         document.getElementById("formTitle").textContent = "Buat Artikel Baru";
         document.getElementById("saveBtn").textContent = "💾 Simpan Artikel";
         selectedTags = [];
         renderTagChips();
+        // Reset multi images
+        articleImages = [];
+        renderMultiImageList();
       }
 
-      async function handleImageUpload(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        if (file.size > 5 * 1024 * 1024) {
-          showToast("Ukuran file maks. 5MB", "error");
+      // ── MULTI IMAGE SYSTEM ───────────────────────────────────────────
+      // articleImages: array of { url, caption }
+      // index 0 = [image1], index 1 = [image2], etc.
+
+      function renderMultiImageList() {
+        const list = document.getElementById("multiImageList");
+        if (!articleImages.length) { list.innerHTML = ""; return; }
+        list.innerHTML = articleImages.map((img, i) => `
+          <div class="multi-img-item" id="imgItem${i}">
+            <img class="img-thumb" src="${img.url}" alt="Gambar ${i+1}" onerror="this.style.opacity='.3'" />
+            <div class="img-info">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <span class="img-tag-badge">[image${i+1}]</span>
+                <span class="img-label">Gambar ke-${i+1}</span>
+              </div>
+              <input
+                class="img-caption-input"
+                type="text"
+                placeholder="Sumber / keterangan gambar (opsional, muncul kecil di bawah gambar)..."
+                value="${escapeAttr(img.caption)}"
+                oninput="articleImages[${i}].caption = this.value"
+              />
+              <span class="img-url-text" title="${img.url}">${img.url}</span>
+            </div>
+            <button class="btn-remove-img" onclick="removeArticleImage(${i})">✕ Hapus</button>
+          </div>
+        `).join("");
+        // Sync first image URL to fImageUrl field for backward compat
+        document.getElementById("fImageUrl").value = articleImages[0]?.url || "";
+      }
+
+      function removeArticleImage(index) {
+        articleImages.splice(index, 1);
+        renderMultiImageList();
+      }
+
+      function escapeAttr(str) {
+        return (str || "").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+      }
+
+      async function handleMultiImageUpload(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+        const oversized = files.filter(f => f.size > 5 * 1024 * 1024);
+        if (oversized.length) {
+          showToast(`${oversized.length} file melebihi batas 5MB`, "error");
           return;
         }
         const progress = document.getElementById("uploadProgress");
         const bar = document.getElementById("uploadProgressBar");
+        const statusText = document.getElementById("uploadStatusText");
         progress.style.display = "block";
-        bar.style.width = "30%";
-        try {
-          const ext = file.name.split(".").pop();
-          const fileName = `article-${Date.now()}.${ext}`;
-          bar.style.width = "60%";
-          const { error } = await db.storage
-            .from("article-images")
-            .upload(fileName, file, { upsert: true });
-          if (error) throw error;
-          bar.style.width = "100%";
-          const { data: urlData } = db.storage
-            .from("article-images")
-            .getPublicUrl(fileName);
-          document.getElementById("fImageUrl").value = urlData.publicUrl;
-          const img = document.getElementById("previewImg");
-          img.src = urlData.publicUrl;
-          img.style.display = "block";
-          showToast("Gambar berhasil diupload ✓");
-        } catch (err) {
-          showToast("Gagal upload: " + err.message, "error");
-        } finally {
-          setTimeout(() => {
-            progress.style.display = "none";
-            bar.style.width = "0%";
-          }, 800);
+        statusText.style.display = "block";
+        let uploaded = 0;
+        for (const file of files) {
+          bar.style.width = Math.round((uploaded / files.length) * 80) + "%";
+          statusText.textContent = `Mengupload ${uploaded + 1} dari ${files.length}...`;
+          try {
+            const ext = file.name.split(".").pop();
+            const fileName = `article-${Date.now()}-${Math.random().toString(36).slice(2,6)}.${ext}`;
+            const { error } = await db.storage.from("article-images").upload(fileName, file, { upsert: true });
+            if (error) throw error;
+            const { data: urlData } = db.storage.from("article-images").getPublicUrl(fileName);
+            articleImages.push({ url: urlData.publicUrl, caption: "" });
+          } catch (err) {
+            showToast(`Gagal upload ${file.name}: ${err.message}`, "error");
+          }
+          uploaded++;
         }
+        bar.style.width = "100%";
+        statusText.textContent = `${uploaded} gambar berhasil diproses`;
+        renderMultiImageList();
+        e.target.value = "";
+        showToast(`${articleImages.length} gambar siap digunakan ✓`);
+        setTimeout(() => {
+          progress.style.display = "none";
+          bar.style.width = "0%";
+          statusText.style.display = "none";
+        }, 1200);
       }
 
-      function previewFromUrl() {
+      function syncUrlToImageList() {
+        // When admin types URL manually, update or add first image
         const url = document.getElementById("fImageUrl").value.trim();
-        const img = document.getElementById("previewImg");
-        if (url) {
-          img.src = url;
-          img.style.display = "block";
+        if (!url) return;
+        if (articleImages.length === 0) {
+          articleImages.push({ url, caption: "" });
         } else {
-          img.style.display = "none";
+          articleImages[0].url = url;
         }
+        renderMultiImageList();
       }
+
+      // Legacy stub kept so old references don't break
+      function previewFromUrl() { syncUrlToImageList(); }
 
       function updateSlugPreview() {
         const title = document.getElementById("fTitle").value;
@@ -1664,7 +1801,6 @@
         const title = document.getElementById("fTitle").value.trim();
         const content = document.getElementById("fContent").value.trim();
         const excerpt = document.getElementById("fExcerpt").value.trim();
-        const image_url = document.getElementById("fImageUrl").value.trim();
         const published = document.getElementById("fPublished").checked;
         if (!title) {
           showToast("Judul tidak boleh kosong", "error");
@@ -1678,6 +1814,10 @@
           showToast("Tambahkan minimal satu tag", "error");
           return;
         }
+        // Build image data: primary image_url = first image, images = full array
+        const image_url = articleImages.length ? articleImages[0].url : "";
+        const images = articleImages.map(img => ({ url: img.url, caption: img.caption || "" }));
+
         const btn = document.getElementById("saveBtn");
         btn.disabled = true;
         btn.textContent = "Menyimpan...";
@@ -1689,6 +1829,7 @@
             content,
             excerpt,
             image_url,
+            images,
             published,
             slug,
             updated_at: new Date().toISOString(),
