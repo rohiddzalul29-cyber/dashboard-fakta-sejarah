@@ -1127,14 +1127,6 @@
                 placeholder="Satu kalimat ringkasan peristiwa..."
               />
             </div>
-            <div class="form-row">
-              <label>Isi Lengkap (HTML diperbolehkan)</label>
-              <textarea
-                id="hContent"
-                style="min-height: 180px"
-                placeholder="Ceritakan detail peristiwa bersejarah ini..."
-              ></textarea>
-            </div>
             <div class="publish-row">
               <label class="toggle"
                 ><input type="checkbox" id="hPublished" checked /><span
@@ -1913,7 +1905,6 @@
           "hTitle",
           "hHistDate",
           "hExcerpt",
-          "hContent",
           "hExpiresAt",
         ].forEach((id) => (document.getElementById(id).value = ""));
         document.getElementById("hPublished").checked = true;
@@ -1970,7 +1961,6 @@
         document.getElementById("hTitle").value = h.title || "";
         document.getElementById("hHistDate").value = h.hist_date || "";
         document.getElementById("hExcerpt").value = h.excerpt || "";
-        document.getElementById("hContent").value = h.content || "";
         document.getElementById("hPublished").checked = h.published || false;
         document.getElementById("hExpiresAt").value = h.expires_at
           ? new Date(h.expires_at).toLocaleString("id-ID")
@@ -1989,7 +1979,6 @@
         const title = document.getElementById("hTitle").value.trim();
         const hist_date = document.getElementById("hHistDate").value.trim();
         const excerpt = document.getElementById("hExcerpt").value.trim();
-        const content = document.getElementById("hContent").value.trim();
         const published = document.getElementById("hPublished").checked;
         if (!title) {
           showToast("Judul tidak boleh kosong", "error");
@@ -2015,7 +2004,6 @@
             title,
             hist_date,
             excerpt,
-            content,
             published,
             updated_at: now.toISOString(),
           };
