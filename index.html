@@ -10,6 +10,82 @@
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- ══ ONESIGNAL PUSH NOTIFICATION ══════════════════════════════════ -->
+    <!-- LANGKAH SETUP:
+         1. Daftar di https://onesignal.com → buat App baru → Web Push
+         2. Isi website URL & ganti ONESIGNAL_APP_ID di bawah dengan App ID kamu
+         3. Untuk mengirim notifikasi dari dashboard, kamu butuh REST API Key
+            dari Settings → Keys & IDs → REST API Key → isi ONESIGNAL_REST_KEY
+         4. PENTING: karena REST API Key harus dirahasiakan, gunakan Supabase
+            Edge Function sebagai proxy (lihat onesignal-proxy/index.ts di bawah)
+    -->
+    <script>
+      // ── GANTI INI DENGAN NILAI DARI AKUN ONESIGNAL KAMU ──────────────
+      const ONESIGNAL_APP_ID   = "111e883c-4bb5-418e-92e9-139868554285";
+      // REST API Key JANGAN diexpose di frontend produksi!
+      // Gunakan Supabase Edge Function proxy (panduan di bawah).
+      // Untuk testing lokal, boleh diisi di sini sementara:
+      const ONESIGNAL_REST_KEY = "os_v2_app_cepiqpclwvay5exjcomgqvkcqxanemxm4oyea5n6xou4gmwityvcyxdblfthzw6y4oxxdf26enn2ipfgfpomsteiq6zxz2jzel7x3ry";
+      // URL Edge Function Supabase kamu (opsional, lebih aman):
+      const ONESIGNAL_PROXY_URL = ""; // contoh: "https://xyz.supabase.co/functions/v1/send-notification"
+    </script>
+    <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+    <script>
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      OneSignalDeferred.push(async function(OneSignal) {
+        await OneSignal.init({
+          appId: "111e883c-4bb5-418e-92e9-139868554285",
+          // Minta izin notifikasi otomatis saat halaman dibuka
+          promptOptions: {
+            slidedown: {
+              prompts: [
+                {
+                  type: "push",
+                  autoPrompt: true,
+                  text: {
+                    actionMessage: "Daftar notifikasi untuk mendapat update artikel sejarah terbaru!",
+                    acceptButton: "Izinkan",
+                    cancelButton: "Nanti",
+                  },
+                  delay: {
+                    pageViews: 1,
+                    timeDelay: 3,
+                  },
+                }
+              ]
+            }
+          },
+          welcomeNotification: {
+            title: "📜 Sejarah Setiap Hari",
+            message: "Terima kasih! Kamu akan menerima notifikasi artikel sejarah terbaru.",
+          },
+          notifyButton: {
+            enable: true,
+            size: "medium",
+            theme: "default",
+            position: "bottom-right",
+            offset: { bottom: "20px", right: "20px" },
+            showCredit: false,
+            text: {
+              "tip.state.unsubscribed": "Aktifkan notifikasi artikel baru",
+              "tip.state.subscribed": "Notifikasi aktif ✓",
+              "tip.state.blocked": "Notifikasi diblokir",
+              "message.prenotify": "Klik untuk berlangganan",
+              "message.action.subscribed": "Berhasil berlangganan notifikasi!",
+              "message.action.resubscribed": "Notifikasi diaktifkan kembali",
+              "message.action.unsubscribed": "Notifikasi dinonaktifkan",
+              "dialog.main.title": "Kelola Notifikasi",
+              "dialog.main.button.subscribe": "AKTIFKAN",
+              "dialog.main.button.unsubscribe": "NONAKTIFKAN",
+              "dialog.blocked.title": "Buka Blokir Notifikasi",
+              "dialog.blocked.message": "Ikuti panduan ini untuk mengizinkan notifikasi:",
+            }
+          }
+        });
+      });
+    </script>
+    <!-- ══ END ONESIGNAL ════════════════════════════════════════════════ -->
     <style>
       :root {
         --bg: #0f0b07;
@@ -30,6 +106,10 @@
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+      }
+      html, body {
+        overflow-x: hidden;
+        max-width: 100%;
       }
       body {
         font-family: "DM Sans", sans-serif;
@@ -594,7 +674,49 @@
         display: block;
       }
 
-      /* ── TAG INPUT SYSTEM ── */
+      /* ── ONESIGNAL NOTIFICATION TOGGLE ── */
+      .notif-toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: rgba(201,151,43,0.07);
+        border: 1px solid rgba(201,151,43,0.25);
+        border-radius: 2px;
+        margin-top: 8px;
+      }
+      .notif-toggle-row .notif-icon { font-size: 1rem; }
+      .notif-toggle-row .notif-text { font-size: 0.8rem; color: var(--text-muted); flex: 1; }
+      .notif-toggle-row .notif-text strong { color: var(--gold); }
+      .notif-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        padding: 3px 9px;
+        border-radius: 2px;
+      }
+      .notif-status-badge.sending {
+        background: rgba(41,128,185,0.2);
+        color: #2980b9;
+        border: 1px solid rgba(41,128,185,0.3);
+      }
+      .notif-status-badge.sent {
+        background: rgba(39,174,96,0.2);
+        color: #27ae60;
+        border: 1px solid rgba(39,174,96,0.3);
+      }
+      .notif-status-badge.failed {
+        background: rgba(192,57,43,0.2);
+        color: #e74c3c;
+        border: 1px solid rgba(192,57,43,0.3);
+      }
+      /* OneSignal bell button z-index fix */
+      #onesignal-bell-container { z-index: 9998 !important; }
+
       .tag-input-wrap {
         background: var(--surface2);
         border: 1px solid var(--border);
@@ -790,25 +912,156 @@
         background: rgba(192, 57, 43, 0.15);
       }
 
-      @media (max-width: 900px) {
-        .sidebar {
-          width: 60px;
-        }
-        .sb-logo-title,
-        .sb-logo-sub,
-        .sb-badge,
-        .sb-nav-label,
-        .sb-nav a span {
-          display: none;
-        }
+      /* ── MOBILE TOPBAR ── */
+      .mobile-topbar {
+        display: none;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 12px 16px;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 200;
+      }
+      .mobile-topbar-title {
+        font-family: "Playfair Display", serif;
+        font-size: 0.95rem;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .mobile-status {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      /* ── BOTTOM NAV ── */
+      .bottom-nav {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--surface);
+        border-top: 1px solid var(--border);
+        z-index: 200;
+        padding: 6px 0 env(safe-area-inset-bottom, 6px);
+      }
+      .bottom-nav-inner {
+        display: flex;
+        justify-content: space-around;
+      }
+      .bnav-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        padding: 5px 8px;
+        cursor: pointer;
+        flex: 1;
+        text-decoration: none;
+      }
+      .bnav-item .bi { font-size: 1.2rem; line-height: 1; }
+      .bnav-item .bl {
+        font-size: 0.58rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.2s;
+      }
+      .bnav-item.active .bl { color: var(--gold); }
+      .bnav-item.active .bi { filter: drop-shadow(0 0 4px var(--gold)); }
+
+      /* ── RESPONSIVE ── */
+      @media (max-width: 768px) {
+        html, body { overflow-x: hidden; }
+        body { display: block; }
+
+        .sidebar { display: none !important; }
+        .topbar { display: none !important; }
+        .mobile-topbar { display: flex !important; }
+        .bottom-nav { display: block !important; }
+
         .main {
-          margin-left: 60px;
+          margin-left: 0 !important;
+          width: 100%;
+          min-height: 100vh;
         }
+        .content {
+          padding: 12px;
+          padding-bottom: 80px;
+        }
+
+        /* Stats 2 kolom */
         .stats-row {
           grid-template-columns: 1fr 1fr;
+          gap: 8px;
+          margin-bottom: 1rem;
         }
-        .form-grid {
-          grid-template-columns: 1fr;
+        .stat-card {
+          padding: 0.9rem 1rem;
+        }
+        .stat-card .value { font-size: 1.5rem; }
+
+        /* Page header */
+        .page-header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          margin-bottom: 1rem;
+        }
+        .page-header .btn-primary { width: 100%; text-align: center; }
+
+        /* Form */
+        .form-grid { grid-template-columns: 1fr; }
+        .form-panel { padding: 1rem; }
+
+        /* Table scroll horizontal */
+        .table-wrap {
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          width: 100%;
+          max-width: 100%;
+        }
+        table { min-width: 480px; }
+        th { padding: 10px 10px; font-size: 0.58rem; }
+        td { padding: 10px 10px; font-size: 0.78rem; }
+        .td-title { max-width: 160px; }
+        .td-actions { gap: 4px; }
+        .btn-edit, .btn-danger { padding: 5px 9px; font-size: 0.65rem; }
+
+        /* multi-img-item */
+        .multi-img-item {
+          grid-template-columns: 60px 1fr auto;
+          gap: 0.6rem;
+        }
+
+        /* publish row */
+        .publish-row { flex-wrap: wrap; gap: 0.6rem; }
+
+        /* confirm box */
+        .confirm-box { padding: 1.2rem; }
+        .confirm-btns { flex-direction: column; gap: 0.6rem; }
+        .confirm-btns button { width: 100%; }
+
+        /* Toast */
+        .toast {
+          bottom: 76px;
+          left: 12px;
+          right: 12px;
+          width: auto;
+          font-size: 0.78rem;
+        }
+
+        /* All inputs & buttons max width */
+        input, select, textarea, .btn-primary, .btn-secondary {
+          max-width: 100%;
         }
       }
     </style>
@@ -870,6 +1123,38 @@
     </div>
 
     <div class="toast" id="toast"></div>
+
+    <!-- MOBILE TOPBAR -->
+    <div class="mobile-topbar">
+      <div class="mobile-topbar-title">
+        <span>🏛️</span> <span id="mobileTitle">Daftar Artikel</span>
+      </div>
+      <div class="mobile-status">
+        <div class="status-dot" id="statusDotMobile" style="width:7px;height:7px;border-radius:50%;background:var(--text-muted)"></div>
+        <span id="statusTextMobile">Menghubungkan...</span>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <div class="bottom-nav-inner">
+        <a class="bnav-item active" id="bnav-list" href="#" onclick="showTab('list',this);return false">
+          <span class="bi">📋</span><span class="bl">Artikel</span>
+        </a>
+        <a class="bnav-item" id="bnav-create" href="#" onclick="showTab('create',this);return false">
+          <span class="bi">✍️</span><span class="bl">Buat</span>
+        </a>
+        <a class="bnav-item" id="bnav-history" href="#" onclick="showTab('history',this);return false">
+          <span class="bi">📅</span><span class="bl">Hari Ini</span>
+        </a>
+        <a class="bnav-item" id="bnav-tags" href="#" onclick="showTab('tags',this);return false">
+          <span class="bi">🏷️</span><span class="bl">Tag</span>
+        </a>
+        <a class="bnav-item" id="bnav-social" href="#" onclick="showTab('social',this);return false">
+          <span class="bi">📱</span><span class="bl">Sosial</span>
+        </a>
+      </div>
+    </nav>
 
     <!-- SIDEBAR -->
     <aside class="sidebar">
@@ -1110,6 +1395,18 @@
                 </button>
               </div>
             </div>
+            <!-- ── ONESIGNAL: Kirim Notifikasi ── -->
+            <div class="notif-toggle-row" id="notifToggleRow">
+              <span class="notif-icon">🔔</span>
+              <span class="notif-text">
+                <strong>Kirim Notifikasi Push</strong> — beritahu subscriber saat artikel ini dipublish
+              </span>
+              <label class="toggle" style="flex-shrink:0">
+                <input type="checkbox" id="fSendNotif" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+            <div id="notifStatusArea" style="display:none;margin-top:6px;padding:0 2px"></div>
           </div>
         </div>
 
@@ -1557,6 +1854,7 @@
       function showTab(name, el) {
         document.querySelectorAll(".tab-content").forEach((t) => t.classList.remove("active"));
         document.querySelectorAll(".sb-nav a").forEach((a) => a.classList.remove("active"));
+        document.querySelectorAll(".bnav-item").forEach((a) => a.classList.remove("active"));
         document.getElementById("tab-" + name).classList.add("active");
         const titles = {
           list: "Daftar Artikel",
@@ -1565,8 +1863,14 @@
           tags: "Kelola Tag",
           social: "Konten Sosial",
         };
-        document.getElementById("topbarTitle").textContent = titles[name] || name;
+        const title = titles[name] || name;
+        document.getElementById("topbarTitle").textContent = title;
+        const mobileTitle = document.getElementById("mobileTitle");
+        if (mobileTitle) mobileTitle.textContent = title;
         if (el) el.classList.add("active");
+        const bnavEl = document.getElementById("bnav-" + name);
+        if (bnavEl) bnavEl.classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
         if (name === "list") loadArticles();
         if (name === "history") loadHistory();
         if (name === "tags") loadTagsTable();
@@ -1796,6 +2100,94 @@
         }
       }
 
+      // ── ONESIGNAL: KIRIM PUSH NOTIFICATION ───────────────────────────
+
+      /**
+       * Kirim push notification ke semua subscriber via OneSignal REST API.
+       * Untuk produksi: gunakan Supabase Edge Function sebagai proxy agar
+       * REST API Key tidak terekspos di frontend.
+       *
+       * @param {string} title     - Judul artikel
+       * @param {string} excerpt   - Ringkasan artikel (opsional)
+       * @param {string} slug      - Slug artikel untuk URL klik
+       * @param {string} imageUrl  - URL gambar (opsional)
+       */
+      async function sendPushNotification(title, excerpt, slug, imageUrl) {
+        const notifArea = document.getElementById("notifStatusArea");
+        notifArea.style.display = "block";
+        notifArea.innerHTML = `<span class="notif-status-badge sending">⏳ Mengirim notifikasi...</span>`;
+
+        const articleUrl = `${window.location.origin}/artikel/${slug}`;
+
+        const payload = {
+          app_id: ONESIGNAL_APP_ID,
+          included_segments: ["Total Subscriptions"],
+          headings: { en: "📜 Fakta Sejarah", id: "📜 Fakta Sejarah" },
+          contents: { en: title, id: title },
+          subtitle: { en: "Artikel baru telah diterbitkan.", id: "Artikel baru telah diterbitkan." },
+          url: articleUrl,
+          web_url: articleUrl,
+          app_url: articleUrl,
+          chrome_web_image: imageUrl || undefined,
+          chrome_web_icon: imageUrl || undefined,
+          firefox_icon: imageUrl || undefined,
+          // Template notifikasi: 📜 Fakta Sejarah / [JUDUL] / Artikel baru telah diterbitkan. / Klik untuk membaca.
+          data: {
+            article_slug: slug,
+            type: "new_article"
+          },
+        };
+
+        try {
+          // Jika ada proxy Supabase Edge Function, gunakan itu (lebih aman)
+          if (ONESIGNAL_PROXY_URL) {
+            const res = await fetch(ONESIGNAL_PROXY_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ title, excerpt, slug, imageUrl }),
+            });
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || "Proxy error " + res.status);
+            notifArea.innerHTML = `<span class="notif-status-badge sent">✓ Notifikasi terkirim (${json.recipients || "?"} penerima)</span>`;
+            return;
+          }
+
+          // Direct call ke OneSignal API (gunakan hanya untuk development/testing)
+          if (!ONESIGNAL_REST_KEY || ONESIGNAL_REST_KEY.startsWith("GANTI")) {
+            notifArea.innerHTML = `<span class="notif-status-badge failed">⚠️ REST API Key belum dikonfigurasi</span>`;
+            return;
+          }
+
+          const res = await fetch("https://onesignal.com/api/v1/notifications", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Basic ${ONESIGNAL_REST_KEY}`,
+            },
+            body: JSON.stringify(payload),
+          });
+          const json = await res.json();
+          if (json.errors) throw new Error(JSON.stringify(json.errors));
+          const recipients = json.recipients || 0;
+          notifArea.innerHTML = `<span class="notif-status-badge sent">✓ Notifikasi terkirim ke ${recipients.toLocaleString("id-ID")} subscriber</span>`;
+
+          // Simpan log notifikasi ke Supabase (opsional — tabel notification_logs)
+          try {
+            await db.from("notification_logs").insert([{
+              article_slug: slug,
+              article_title: title,
+              recipients,
+              onesignal_id: json.id,
+              sent_at: new Date().toISOString(),
+            }]);
+          } catch (_) { /* tabel opsional, abaikan jika belum ada */ }
+
+        } catch (err) {
+          console.error("OneSignal error:", err);
+          notifArea.innerHTML = `<span class="notif-status-badge failed">✗ Gagal kirim: ${err.message}</span>`;
+        }
+      }
+
       async function saveArticle() {
         const id = document.getElementById("editId").value;
         const title = document.getElementById("fTitle").value.trim();
@@ -1865,6 +2257,18 @@
               ? "Artikel berhasil diperbarui ✓"
               : "Artikel berhasil disimpan ✓",
           );
+
+          // ── Kirim Push Notification jika artikel dipublish & toggle aktif ──
+          const sendNotif = document.getElementById("fSendNotif").checked;
+          if (published && sendNotif) {
+            // Untuk artikel baru ATAU artikel yang baru saja dipublish
+            const wasPublished = id ? (articles.find(a => a.id === id)?.published) : false;
+            if (!id || !wasPublished) {
+              // Jalankan async tanpa block UI
+              sendPushNotification(title, excerpt, slug, articleImages[0]?.url || "");
+            }
+          }
+
           resetForm();
           showTab("list");
           document.querySelectorAll(".sb-nav a")[0].classList.add("active");
@@ -1873,7 +2277,7 @@
           showToast("Gagal menyimpan: " + err.message, "error");
         } finally {
           btn.disabled = false;
-          btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Artikel";
+          btn.textContent = id ? " Simpan Perubahan" : " Simpan Artikel";
         }
       }
 
@@ -2173,8 +2577,8 @@
         } finally {
           btn.disabled = false;
           btn.textContent = id
-            ? "💾 Simpan Perubahan"
-            : "💾 Simpan Artikel Harian";
+            ? " Simpan Perubahan"
+            : " Simpan Artikel Harian";
         }
       }
 
