@@ -912,6 +912,80 @@
         background: rgba(192, 57, 43, 0.15);
       }
 
+      /* ── AD MANAGEMENT ── */
+      .ad-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 1rem;
+      }
+      .ad-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        overflow: hidden;
+        transition: border-color 0.2s;
+      }
+      .ad-card:hover { border-color: var(--gold); }
+      .ad-card-img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        display: block;
+        background: var(--surface2);
+        cursor: pointer;
+      }
+      .ad-card-img-placeholder {
+        width: 100%;
+        height: 150px;
+        background: var(--surface2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--text-muted);
+      }
+      .ad-card-body { padding: 0.9rem 1rem; }
+      .ad-card-title {
+        font-weight: 600;
+        font-size: 0.88rem;
+        color: #fff;
+        margin-bottom: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .ad-card-link {
+        font-size: 0.7rem;
+        color: var(--gold);
+        text-decoration: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        margin-bottom: 8px;
+      }
+      .ad-card-link:hover { text-decoration: underline; }
+      .ad-card-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 8px;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .ad-card-actions { display: flex; gap: 6px; }
+      .ad-pos-badge {
+        display: inline-block;
+        font-size: 0.58rem;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 2px;
+        background: rgba(201,151,43,0.15);
+        color: var(--gold);
+        border: 1px solid rgba(201,151,43,0.3);
+        font-weight: 600;
+      }
+
       /* ── MOBILE TOPBAR ── */
       .mobile-topbar {
         display: none;
@@ -1122,6 +1196,18 @@
       </div>
     </div>
 
+    <!-- CONFIRM: Hapus Iklan -->
+    <div class="confirm-overlay" id="adConfirmOverlay">
+      <div class="confirm-box">
+        <h3>Hapus Iklan?</h3>
+        <p>Iklan ini akan dihapus permanen. Tindakan ini tidak bisa dibatalkan.</p>
+        <div class="confirm-btns">
+          <button class="btn-danger" id="adConfirmYes">Ya, Hapus</button>
+          <button class="btn-secondary" onclick="closeAdConfirm()">Batal</button>
+        </div>
+      </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <!-- MOBILE TOPBAR -->
@@ -1153,6 +1239,9 @@
         <a class="bnav-item" id="bnav-social" href="#" onclick="showTab('social',this);return false">
           <span class="bi">📱</span><span class="bl">Sosial</span>
         </a>
+        <a class="bnav-item" id="bnav-ads" href="#" onclick="showTab('ads',this);return false">
+          <span class="bi">📢</span><span class="bl">Iklan</span>
+        </a>
       </div>
     </nav>
 
@@ -1182,6 +1271,9 @@
         >
         <a href="#" onclick="showTab('social', this)"
           ><span class="icon">📱</span><span>Konten Sosial</span></a
+        >
+        <a href="#" onclick="showTab('ads', this)"
+          ><span class="icon">📢</span><span>Kelola Iklan</span></a
         >
         <div class="sb-nav-label">Lainnya</div>
         <a href="index.html" target="_blank"
@@ -1755,6 +1847,107 @@
           </div>
         </div>
 
+        <!-- TAB: KELOLA IKLAN -->
+        <div class="tab-content" id="tab-ads">
+          <div class="page-header">
+            <h2>Kelola Iklan</h2>
+            <button class="btn-primary" onclick="showAdForm()">+ Tambah Iklan</button>
+          </div>
+
+          <!-- Info -->
+          <div style="background:rgba(201,151,43,0.08);border:1px solid var(--border);padding:0.9rem 1.2rem;margin-bottom:1.2rem;font-size:0.78rem;color:var(--text-muted);line-height:1.7">
+            📢 <strong style="color:var(--gold)">Cara Kerja Iklan:</strong>
+            Upload gambar iklan dan masukkan link tujuan. Saat pengunjung mengklik gambar iklan di website, mereka akan diarahkan ke halaman iklan tersebut di tab baru.
+            Gunakan <strong style="color:var(--text)">Posisi</strong> untuk mengatur di mana iklan muncul:
+            <strong style="color:var(--gold)">Sidebar</strong> = bawah Today in History ·
+            <strong style="color:var(--gold)">Top Banner</strong> = bawah Artikel Terbaru ·
+            <strong style="color:var(--gold)">Inline</strong> = dalam halaman artikel.
+          </div>
+
+          <!-- Form Panel -->
+          <div class="form-panel" id="adFormPanel" style="display:none;margin-bottom:1.5rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
+              <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#fff" id="adFormTitle">Tambah Iklan Baru</h3>
+              <button class="btn-secondary" onclick="hideAdForm()">✕ Tutup</button>
+            </div>
+            <input type="hidden" id="adEditId" />
+            <div class="form-grid">
+              <div class="form-row" style="grid-column:1/-1">
+                <label>Nama / Judul Iklan *</label>
+                <input type="text" id="adTitle" placeholder="Contoh: Banner Promo Ramadan..." />
+              </div>
+              <div class="form-row" style="grid-column:1/-1">
+                <label>Link Tujuan Iklan *</label>
+                <input type="url" id="adLinkUrl" placeholder="https://www.contoh.com/halaman-iklan" />
+                <div class="hint">URL lengkap tujuan saat iklan diklik. Akan dibuka di tab baru.</div>
+              </div>
+              <div class="form-row">
+                <label>Posisi Tampil</label>
+                <select id="adPosition">
+                  <option value="top">Top Banner (bawah Artikel Terbaru)</option>
+                  <option value="sidebar">Sidebar (bawah Today in History)</option>
+                  <option value="inline">Inline (dalam halaman artikel)</option>
+                  <option value="bottom">Bottom Banner</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label>Urutan Tampil</label>
+                <input type="number" id="adOrder" placeholder="1" min="1" value="1" />
+                <div class="hint">Angka kecil = tampil lebih dulu.</div>
+              </div>
+              <div class="form-row" style="grid-column:1/-1">
+                <label>Gambar Iklan *</label>
+                <div class="upload-zone" onclick="document.getElementById('adImageFile').click()">
+                  <input type="file" id="adImageFile" accept="image/*" onchange="handleAdImageUpload(event)" />
+                  <div class="uz-icon">🖼️</div>
+                  <p><strong>Klik untuk upload gambar iklan</strong></p>
+                  <p>JPG, PNG, WEBP — maks. 5MB</p>
+                </div>
+                <div class="upload-progress" id="adUploadProgress" style="margin-top:6px">
+                  <div class="upload-progress-bar" id="adUploadProgressBar"></div>
+                </div>
+                <div class="hint" style="margin-top:8px">Atau masukkan URL gambar langsung:</div>
+                <input type="url" id="adImageUrl" placeholder="https://..." oninput="previewAdImage()" style="margin-top:6px" />
+                <img id="adImagePreview" class="preview-img" alt="Preview Iklan" style="max-height:200px" />
+              </div>
+            </div>
+            <div class="publish-row">
+              <label class="toggle">
+                <input type="checkbox" id="adActive" checked />
+                <span class="slider"></span>
+              </label>
+              <span class="toggle-label">Aktifkan iklan (tampil di website publik)</span>
+              <div style="margin-left:auto;display:flex;gap:10px">
+                <button class="btn-secondary" onclick="resetAdForm()">Reset</button>
+                <button class="btn-primary" onclick="saveAd()" id="adSaveBtn">💾 Simpan Iklan</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter -->
+          <div style="display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap">
+            <select id="adFilterPosition" onchange="loadAds()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:8px 14px;outline:none;border-radius:0">
+              <option value="">Semua Posisi</option>
+              <option value="top">Top Banner</option>
+              <option value="sidebar">Sidebar</option>
+              <option value="inline">Inline</option>
+              <option value="bottom">Bottom Banner</option>
+            </select>
+            <select id="adFilterActive" onchange="loadAds()" style="background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:.78rem;padding:8px 14px;outline:none;border-radius:0">
+              <option value="">Semua Status</option>
+              <option value="true">Aktif</option>
+              <option value="false">Nonaktif</option>
+            </select>
+          </div>
+
+          <!-- Ad Grid -->
+          <div id="adGrid" class="ad-grid">
+            <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /content -->
     <!-- /main -->
 
@@ -1862,6 +2055,7 @@
           history: "Sejarah Hari Ini",
           tags: "Kelola Tag",
           social: "Konten Sosial",
+          ads: "Kelola Iklan",
         };
         const title = titles[name] || name;
         document.getElementById("topbarTitle").textContent = title;
@@ -1875,6 +2069,7 @@
         if (name === "history") loadHistory();
         if (name === "tags") loadTagsTable();
         if (name === "social") loadSocialContents();
+        if (name === "ads") loadAds();
       }
 
       // ── ARTICLES ─────────────────────────────────────────────────────
@@ -2951,6 +3146,193 @@
           closeScConfirm();
           showToast("Konten sosial dihapus");
           loadSocialContents();
+        } catch (e) {
+          showToast("Gagal menghapus: " + e.message, "error");
+        }
+      };
+
+      // ══════════════════════════════════════════════════════════════════
+      // KELOLA IKLAN (ADS)
+      // ══════════════════════════════════════════════════════════════════
+      let ads = [];
+      let adDeleteTargetId = null;
+
+      const adPositionLabels = {
+        top: "Top Banner",
+        sidebar: "Sidebar",
+        inline: "Inline Artikel",
+        bottom: "Bottom Banner"
+      };
+
+      async function loadAds() {
+        const grid = document.getElementById("adGrid");
+        if (!grid) return;
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)"><div class="spinner"></div></div>';
+        try {
+          const pos = document.getElementById("adFilterPosition").value;
+          const active = document.getElementById("adFilterActive").value;
+          let q = db.from("ads").select("*").order("ad_order", { ascending: true });
+          if (pos) q = q.eq("position", pos);
+          if (active !== "") q = q.eq("is_active", active === "true");
+          const { data, error } = await q;
+          if (error) throw error;
+          ads = data || [];
+          if (!ads.length) {
+            grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);font-size:.85rem">Belum ada iklan. Klik "+ Tambah Iklan" untuk mulai.</div>';
+            return;
+          }
+          grid.innerHTML = ads.map(ad => `
+            <div class="ad-card">
+              ${ad.image_url
+                ? `<a href="${ad.link_url}" target="_blank" rel="noopener" title="Buka link iklan">
+                     <img class="ad-card-img" src="${ad.image_url}" onerror="this.style.display='none'" alt="${ad.title}" />
+                   </a>`
+                : `<div class="ad-card-img-placeholder">📢</div>`}
+              <div class="ad-card-body">
+                <div class="ad-card-title" title="${ad.title}">${ad.title}</div>
+                <a class="ad-card-link" href="${ad.link_url}" target="_blank" rel="noopener" title="${ad.link_url}">↗ ${ad.link_url}</a>
+                <div class="ad-card-meta">
+                  <div style="display:flex;gap:5px;align-items:center;flex-wrap:wrap">
+                    <span class="ad-pos-badge">${adPositionLabels[ad.position] || ad.position}</span>
+                    <span style="font-size:.68rem;color:var(--text-muted)">#${ad.ad_order || 1}</span>
+                    <span class="badge ${ad.is_active ? 'badge-published' : 'badge-draft'}">${ad.is_active ? 'Aktif' : 'Nonaktif'}</span>
+                  </div>
+                  <div class="ad-card-actions">
+                    <button class="btn-edit" onclick="editAd('${ad.id}')">✏️ Edit</button>
+                    <button class="btn-danger" onclick="confirmDeleteAd('${ad.id}')">🗑</button>
+                  </div>
+                </div>
+              </div>
+            </div>`).join("");
+        } catch (e) {
+          grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">⚠️ Gagal memuat: ${e.message}</div>`;
+        }
+      }
+
+      function showAdForm() {
+        resetAdForm();
+        document.getElementById("adFormPanel").style.display = "block";
+        document.getElementById("adFormPanel").scrollIntoView({ behavior: "smooth" });
+      }
+      function hideAdForm() {
+        document.getElementById("adFormPanel").style.display = "none";
+        resetAdForm();
+      }
+      function resetAdForm() {
+        document.getElementById("adEditId").value = "";
+        document.getElementById("adTitle").value = "";
+        document.getElementById("adLinkUrl").value = "";
+        document.getElementById("adImageUrl").value = "";
+        document.getElementById("adPosition").value = "top";
+        document.getElementById("adOrder").value = "1";
+        document.getElementById("adActive").checked = true;
+        const img = document.getElementById("adImagePreview");
+        img.src = ""; img.style.display = "none";
+        const fi = document.getElementById("adImageFile");
+        if (fi) fi.value = "";
+        document.getElementById("adFormTitle").textContent = "Tambah Iklan Baru";
+        document.getElementById("adSaveBtn").textContent = "💾 Simpan Iklan";
+      }
+      function previewAdImage() {
+        const url = document.getElementById("adImageUrl").value.trim();
+        const img = document.getElementById("adImagePreview");
+        if (url) { img.src = url; img.style.display = "block"; }
+        else img.style.display = "none";
+      }
+      async function handleAdImageUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { showToast("Ukuran file maks. 5MB", "error"); return; }
+        const progress = document.getElementById("adUploadProgress");
+        const bar = document.getElementById("adUploadProgressBar");
+        progress.style.display = "block";
+        bar.style.width = "30%";
+        try {
+          const ext = file.name.split(".").pop();
+          const fileName = `ad-${Date.now()}.${ext}`;
+          bar.style.width = "60%";
+          const { error } = await db.storage.from("article-images").upload(fileName, file, { upsert: true });
+          if (error) throw error;
+          bar.style.width = "100%";
+          const { data: urlData } = db.storage.from("article-images").getPublicUrl(fileName);
+          document.getElementById("adImageUrl").value = urlData.publicUrl;
+          const img = document.getElementById("adImagePreview");
+          img.src = urlData.publicUrl; img.style.display = "block";
+          showToast("Gambar iklan berhasil diupload ✓");
+        } catch (err) {
+          showToast("Gagal upload: " + err.message, "error");
+        } finally {
+          setTimeout(() => { progress.style.display = "none"; bar.style.width = "0%"; }, 800);
+        }
+      }
+      function editAd(id) {
+        const ad = ads.find(x => x.id === id);
+        if (!ad) return;
+        document.getElementById("adEditId").value = ad.id;
+        document.getElementById("adTitle").value = ad.title || "";
+        document.getElementById("adLinkUrl").value = ad.link_url || "";
+        document.getElementById("adImageUrl").value = ad.image_url || "";
+        document.getElementById("adPosition").value = ad.position || "top";
+        document.getElementById("adOrder").value = ad.ad_order || 1;
+        document.getElementById("adActive").checked = !!ad.is_active;
+        if (ad.image_url) {
+          const img = document.getElementById("adImagePreview");
+          img.src = ad.image_url; img.style.display = "block";
+        }
+        document.getElementById("adFormTitle").textContent = "Edit Iklan";
+        document.getElementById("adSaveBtn").textContent = "💾 Simpan Perubahan";
+        document.getElementById("adFormPanel").style.display = "block";
+        document.getElementById("adFormPanel").scrollIntoView({ behavior: "smooth" });
+      }
+      async function saveAd() {
+        const id = document.getElementById("adEditId").value;
+        const title = document.getElementById("adTitle").value.trim();
+        const link_url = document.getElementById("adLinkUrl").value.trim();
+        const image_url = document.getElementById("adImageUrl").value.trim();
+        const position = document.getElementById("adPosition").value;
+        const ad_order = parseInt(document.getElementById("adOrder").value) || 1;
+        const is_active = document.getElementById("adActive").checked;
+        if (!title) { showToast("Nama iklan tidak boleh kosong", "error"); return; }
+        if (!link_url) { showToast("Link tujuan tidak boleh kosong", "error"); return; }
+        if (!image_url) { showToast("Upload atau masukkan URL gambar iklan terlebih dahulu", "error"); return; }
+        const btn = document.getElementById("adSaveBtn");
+        btn.disabled = true; btn.textContent = "Menyimpan...";
+        try {
+          const now = new Date().toISOString();
+          const payload = { title, link_url, image_url, position, ad_order, is_active, updated_at: now };
+          let error;
+          if (id) {
+            ({ error } = await db.from("ads").update(payload).eq("id", id));
+          } else {
+            ({ error } = await db.from("ads").insert([{ ...payload, created_at: now }]));
+          }
+          if (error) throw error;
+          showToast(id ? "Iklan diperbarui ✓" : "Iklan berhasil ditambahkan ✓");
+          hideAdForm();
+          loadAds();
+        } catch (err) {
+          showToast("Gagal menyimpan: " + err.message, "error");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = id ? "💾 Simpan Perubahan" : "💾 Simpan Iklan";
+        }
+      }
+      function confirmDeleteAd(id) {
+        adDeleteTargetId = id;
+        document.getElementById("adConfirmOverlay").classList.add("open");
+      }
+      function closeAdConfirm() {
+        adDeleteTargetId = null;
+        document.getElementById("adConfirmOverlay").classList.remove("open");
+      }
+      document.getElementById("adConfirmYes").onclick = async () => {
+        if (!adDeleteTargetId) return;
+        try {
+          const { error } = await db.from("ads").delete().eq("id", adDeleteTargetId);
+          if (error) throw error;
+          closeAdConfirm();
+          showToast("Iklan berhasil dihapus");
+          loadAds();
         } catch (e) {
           showToast("Gagal menghapus: " + e.message, "error");
         }
