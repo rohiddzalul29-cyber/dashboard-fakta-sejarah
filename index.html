@@ -688,6 +688,32 @@
       .notif-toggle-row .notif-icon { font-size: 1rem; }
       .notif-toggle-row .notif-text { font-size: 0.8rem; color: var(--text-muted); flex: 1; }
       .notif-toggle-row .notif-text strong { color: var(--gold); }
+      .author-mode-toggle {
+        display: flex;
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .author-mode-btn {
+        flex: 1;
+        padding: 10px 14px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        font-family: "DM Sans", sans-serif;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 0;
+      }
+      .author-mode-btn:hover {
+        border-color: var(--gold);
+        color: var(--text);
+      }
+      .author-mode-btn.active {
+        background: var(--gold-dim);
+        border-color: var(--gold);
+        color: var(--gold);
+      }
       .notif-status-badge {
         display: inline-flex;
         align-items: center;
@@ -1465,6 +1491,41 @@
               <div class="hint" style="margin-top: 10px">Atau masukkan URL gambar pertama langsung:</div>
               <input type="text" id="fImageUrl" placeholder="https://..." oninput="syncUrlToImageList()" style="margin-top: 6px" />
             </div>
+            <div class="form-row" style="border-top: 1px solid var(--border); padding-top: 1.4rem">
+              <label>Tentang Penulis</label>
+              <input type="hidden" id="fAuthorMode" value="team" />
+              <div class="author-mode-toggle">
+                <button type="button" class="author-mode-btn" id="authorModeCustomBtn" onclick="setAuthorMode('custom')">
+                  ✍️ Tulis Nama Penulis
+                </button>
+                <button type="button" class="author-mode-btn" id="authorModeTeamBtn" onclick="setAuthorMode('team')">
+                  🏛️ Tetapkan sebagai Tim Redaksi
+                </button>
+              </div>
+              <div class="hint" id="authorTeamHint">Artikel akan ditampilkan sebagai ditulis oleh "Tim Redaksi".</div>
+
+              <div id="authorCustomFields" style="display:none; margin-top: 1rem">
+                <div class="form-row">
+                  <label>Nama Penulis *</label>
+                  <input type="text" id="fAuthorName" placeholder="Nama penulis artikel..." />
+                </div>
+                <div class="hint" style="margin-bottom: 0.8rem">Akun sosial media penulis (opsional):</div>
+                <div class="form-grid">
+                  <div class="form-row">
+                    <label>📷 Instagram</label>
+                    <input type="text" id="fAuthorInstagram" placeholder="@username atau link profil" />
+                  </div>
+                  <div class="form-row">
+                    <label>🎵 TikTok</label>
+                    <input type="text" id="fAuthorTiktok" placeholder="@username atau link profil" />
+                  </div>
+                  <div class="form-row" style="grid-column: 1/-1">
+                    <label>📘 Facebook</label>
+                    <input type="text" id="fAuthorFacebook" placeholder="Nama akun atau link profil" />
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="publish-row">
               <label class="toggle"
                 ><input type="checkbox" id="fPublished" /><span
@@ -2117,6 +2178,25 @@
         }
       }
 
+      function setAuthorMode(mode) {
+        document.getElementById("fAuthorMode").value = mode;
+        const customBtn = document.getElementById("authorModeCustomBtn");
+        const teamBtn = document.getElementById("authorModeTeamBtn");
+        const customFields = document.getElementById("authorCustomFields");
+        const teamHint = document.getElementById("authorTeamHint");
+        if (mode === "custom") {
+          customBtn.classList.add("active");
+          teamBtn.classList.remove("active");
+          customFields.style.display = "block";
+          teamHint.style.display = "none";
+        } else {
+          teamBtn.classList.add("active");
+          customBtn.classList.remove("active");
+          customFields.style.display = "none";
+          teamHint.style.display = "block";
+        }
+      }
+
       function editArticle(id) {
         const a = articles.find((x) => x.id === id);
         if (!a) return;
@@ -2126,6 +2206,14 @@
         document.getElementById("fContent").value = a.content || "";
         document.getElementById("fImageUrl").value = a.image_url || "";
         document.getElementById("fPublished").checked = a.published || false;
+
+        // Tentang Penulis
+        document.getElementById("fAuthorName").value = a.author_name || "";
+        document.getElementById("fAuthorInstagram").value = a.author_instagram || "";
+        document.getElementById("fAuthorTiktok").value = a.author_tiktok || "";
+        document.getElementById("fAuthorFacebook").value = a.author_facebook || "";
+        setAuthorMode(a.author_type === "custom" ? "custom" : "team");
+
         document.getElementById("formTitle").textContent = "Edit Artikel";
         document.getElementById("saveBtn").textContent = "💾 Simpan Perubahan";
         const slugPrev = document.getElementById("slugPreview");
@@ -2167,6 +2255,11 @@
         document.getElementById("fContent").value = "";
         document.getElementById("fImageUrl").value = "";
         document.getElementById("fPublished").checked = false;
+        document.getElementById("fAuthorName").value = "";
+        document.getElementById("fAuthorInstagram").value = "";
+        document.getElementById("fAuthorTiktok").value = "";
+        document.getElementById("fAuthorFacebook").value = "";
+        setAuthorMode("team");
         document.getElementById("slugPreview").style.display = "none";
         document.getElementById("formTitle").textContent = "Buat Artikel Baru";
         document.getElementById("saveBtn").textContent = "💾 Simpan Artikel";
@@ -2389,12 +2482,21 @@
         const content = document.getElementById("fContent").value.trim();
         const excerpt = document.getElementById("fExcerpt").value.trim();
         const published = document.getElementById("fPublished").checked;
+        const authorMode = document.getElementById("fAuthorMode").value;
+        const authorName = document.getElementById("fAuthorName").value.trim();
+        const authorInstagram = document.getElementById("fAuthorInstagram").value.trim();
+        const authorTiktok = document.getElementById("fAuthorTiktok").value.trim();
+        const authorFacebook = document.getElementById("fAuthorFacebook").value.trim();
         if (!title) {
           showToast("Judul tidak boleh kosong", "error");
           return;
         }
         if (!content) {
           showToast("Isi artikel tidak boleh kosong", "error");
+          return;
+        }
+        if (authorMode === "custom" && !authorName) {
+          showToast("Nama penulis tidak boleh kosong", "error");
           return;
         }
         if (!selectedTags.length) {
@@ -2419,6 +2521,11 @@
             images,
             published,
             slug,
+            author_type: authorMode,
+            author_name: authorMode === "custom" ? authorName : null,
+            author_instagram: authorMode === "custom" ? (authorInstagram || null) : null,
+            author_tiktok: authorMode === "custom" ? (authorTiktok || null) : null,
+            author_facebook: authorMode === "custom" ? (authorFacebook || null) : null,
             updated_at: new Date().toISOString(),
           };
           let articleId = id;
@@ -2605,6 +2712,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", () => {
+        setAuthorMode("team");
         const input = document.getElementById("tagTextInput");
         if (!input) return;
         input.addEventListener("input", () => renderTagDropdown(input.value));
