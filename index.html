@@ -208,7 +208,20 @@
       .sb-nav a .icon {
         font-size: 1rem;
         width: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
       }
+      .ic {
+        flex-shrink: 0;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .sb-logo-icon .ic { color: #fff; }
+      .mobile-topbar-icon { display: inline-flex; color: var(--gold); }
+      .bnav-item .bi { display: flex; align-items: center; justify-content: center; }
+      .btn-remove-img { display: inline-flex; align-items: center; gap: 4px; }
       .sb-footer {
         padding: 1.5rem;
         border-top: 1px solid var(--border);
@@ -318,6 +331,10 @@
         border: none;
         cursor: pointer;
         transition: background 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
       }
       .btn-primary:hover {
         background: var(--gold-light);
@@ -332,6 +349,10 @@
         border: 1px solid var(--border);
         cursor: pointer;
         transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: center;
       }
       .btn-secondary:hover {
         border-color: var(--gold);
@@ -347,6 +368,10 @@
         border: none;
         cursor: pointer;
         transition: opacity 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: center;
       }
       .btn-danger:hover {
         opacity: 0.85;
@@ -361,6 +386,10 @@
         border: 1px solid var(--border);
         cursor: pointer;
         transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: center;
       }
       .btn-edit:hover {
         background: var(--gold-dim);
@@ -1239,7 +1268,7 @@
     <!-- MOBILE TOPBAR -->
     <div class="mobile-topbar">
       <div class="mobile-topbar-title">
-        <span id="mobileTitle">Daftar Artikel</span>
+        <span class="mobile-topbar-icon"><svg class="ic ic-building" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><line x1="9" y1="21" x2="9" y2="13"></line><line x1="15" y1="21" x2="15" y2="13"></line><line x1="3" y1="9" x2="21" y2="9"></line></svg></span> <span id="mobileTitle">Daftar Artikel</span>
       </div>
       <div class="mobile-status">
         <div class="status-dot" id="statusDotMobile" style="width:7px;height:7px;border-radius:50%;background:var(--text-muted)"></div>
@@ -1251,21 +1280,27 @@
     <nav class="bottom-nav">
       <div class="bottom-nav-inner">
         <a class="bnav-item active" id="bnav-list" href="#" onclick="showTab('list',this);return false">
+          <span class="bi"><svg class="ic ic-list" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></span>
           <span class="bl">Artikel</span>
         </a>
         <a class="bnav-item" id="bnav-create" href="#" onclick="showTab('create',this);return false">
+          <span class="bi"><svg class="ic ic-create" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span>
           <span class="bl">Buat</span>
         </a>
         <a class="bnav-item" id="bnav-history" href="#" onclick="showTab('history',this);return false">
+          <span class="bi"><svg class="ic ic-calendar" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
           <span class="bl">Hari Ini</span>
         </a>
         <a class="bnav-item" id="bnav-tags" href="#" onclick="showTab('tags',this);return false">
+          <span class="bi"><svg class="ic ic-tag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span>
           <span class="bl">Tag</span>
         </a>
         <a class="bnav-item" id="bnav-social" href="#" onclick="showTab('social',this);return false">
+          <span class="bi"><svg class="ic ic-social" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span>
           <span class="bl">Sosial</span>
         </a>
         <a class="bnav-item" id="bnav-ads" href="#" onclick="showTab('ads',this);return false">
+          <span class="bi"><svg class="ic ic-ad" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 13v-2z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg></span>
           <span class="bl">Iklan</span>
         </a>
       </div>
@@ -1275,7 +1310,7 @@
     <aside class="sidebar">
       <div class="sb-logo">
         <div class="logo-row">
-          <div class="sb-logo-icon">S</div>
+          <div class="sb-logo-icon"><svg class="ic ic-building" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><line x1="9" y1="21" x2="9" y2="13"></line><line x1="15" y1="21" x2="15" y2="13"></line><line x1="3" y1="9" x2="21" y2="9"></line></svg></div>
           <span class="sb-logo-title">Sejarah</span>
         </div>
         <div class="sb-logo-sub">Admin Panel</div>
@@ -1284,26 +1319,26 @@
       <nav class="sb-nav">
         <div class="sb-nav-label">Menu</div>
         <a href="#" class="active" onclick="showTab('list', this)"
-          ><span>Daftar Artikel</span></a
+          ><span class="icon"><svg class="ic ic-list" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg></span><span>Daftar Artikel</span></a
         >
         <a href="#" onclick="showTab('create', this)"
-          ><span>Buat Artikel</span></a
+          ><span class="icon"><svg class="ic ic-create" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></span><span>Buat Artikel</span></a
         >
         <a href="#" onclick="showTab('history', this)"
-          ><span>Sejarah Hari Ini</span></a
+          ><span class="icon"><svg class="ic ic-calendar" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span><span>Sejarah Hari Ini</span></a
         >
         <a href="#" onclick="showTab('tags', this)"
-          ><span>Kelola Tag</span></a
+          ><span class="icon"><svg class="ic ic-tag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg></span><span>Kelola Tag</span></a
         >
         <a href="#" onclick="showTab('social', this)"
-          ><span>Konten Sosial</span></a
+          ><span class="icon"><svg class="ic ic-social" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg></span><span>Konten Sosial</span></a
         >
         <a href="#" onclick="showTab('ads', this)"
-          ><span>Kelola Iklan</span></a
+          ><span class="icon"><svg class="ic ic-ad" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-5v12L3 13v-2z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path></svg></span><span>Kelola Iklan</span></a
         >
         <div class="sb-nav-label">Lainnya</div>
         <a href="index.html" target="_blank"
-          ><span>Lihat Website</span></a
+          ><span class="icon"><svg class="ic ic-globe" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></span><span>Lihat Website</span></a
         >
       </nav>
       <div class="sb-footer">
@@ -1468,14 +1503,14 @@
             <div class="form-row">
               <label>Upload Gambar Artikel</label>
               <div style="background:var(--surface3);border:1px solid var(--border);padding:1rem;margin-bottom:0.5rem;font-size:0.75rem;color:var(--text-muted);line-height:1.7">
-                <strong style="color:var(--gold)">Cara pakai multi-gambar:</strong>
+                <svg class="ic ic-info" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><strong style="color:var(--gold)">Cara pakai multi-gambar:</strong>
                 Upload beberapa gambar di bawah. Gunakan <code style="background:var(--surface);padding:1px 5px;color:var(--gold-light);font-size:0.8rem">[image1]</code>, <code style="background:var(--surface);padding:1px 5px;color:var(--gold-light);font-size:0.8rem">[image2]</code>, dst. di dalam isi artikel untuk menentukan posisi gambar. Angka menunjukkan gambar ke berapa yang muncul.
               </div>
 
               <!-- Drop zone multi upload -->
               <div class="upload-zone" id="multiUploadZone" onclick="document.getElementById('fImageFiles').click()" style="margin-bottom:0">
                 <input type="file" id="fImageFiles" accept="image/*" multiple onchange="handleMultiImageUpload(event)" />
-                <div class="uz-icon"></div>
+                <div class="uz-icon"><svg class="ic ic-image" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
                 <p><strong>Klik untuk upload gambar</strong> (boleh lebih dari satu)</p>
                 <p>JPG, PNG, WEBP — maks. 5MB per gambar</p>
               </div>
@@ -1512,15 +1547,15 @@
                 <div class="hint" style="margin-bottom: 0.8rem">Akun sosial media penulis (opsional):</div>
                 <div class="form-grid">
                   <div class="form-row">
-                    <label>Instagram</label>
+                    <label><svg class="ic ic-platform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>Instagram</label>
                     <input type="text" id="fAuthorInstagram" placeholder="@username atau link profil" />
                   </div>
                   <div class="form-row">
-                    <label>TikTok</label>
+                    <label><svg class="ic ic-platform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>TikTok</label>
                     <input type="text" id="fAuthorTiktok" placeholder="@username atau link profil" />
                   </div>
                   <div class="form-row" style="grid-column: 1/-1">
-                    <label>Facebook</label>
+                    <label><svg class="ic ic-platform" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>Facebook</label>
                     <input type="text" id="fAuthorFacebook" placeholder="Nama akun atau link profil" />
                   </div>
                 </div>
@@ -1544,13 +1579,13 @@
                   onclick="saveArticle()"
                   id="saveBtn"
                 >
-                  Simpan Artikel
+                  <span class="btn-ic"><svg class="ic ic-save" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></span><span class="btn-label">Simpan Artikel</span>
                 </button>
               </div>
             </div>
             <!-- ── ONESIGNAL: Kirim Notifikasi ── -->
             <div class="notif-toggle-row" id="notifToggleRow">
-              
+              <span class="notif-icon"><svg class="ic ic-bell" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></span>
               <span class="notif-text">
                 <strong>Kirim Notifikasi Push</strong> — beritahu subscriber saat artikel ini dipublish
               </span>
@@ -1582,7 +1617,7 @@
               line-height: 1.7;
             "
           >
-            ⏳
+            <svg class="ic ic-clock" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
             <strong style="color: var(--gold)">Artikel Sementara:</strong>
             Setiap artikel "Sejarah Hari Ini" akan otomatis hilang dari website
             publik setelah
@@ -1673,7 +1708,7 @@
                   onclick="saveHistory()"
                   id="hSaveBtn"
                 >
-                  Simpan Artikel Harian
+                  <span class="btn-ic"><svg class="ic ic-save" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></span><span class="btn-label">Simpan Artikel Harian</span>
                 </button>
               </div>
             </div>
@@ -1778,7 +1813,7 @@
                 Reset
               </button>
               <button class="btn-primary" onclick="saveTag()" id="tSaveBtn">
-                Simpan Tag
+                <span class="btn-ic"><svg class="ic ic-save" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></span><span class="btn-label">Simpan Tag</span>
               </button>
             </div>
           </div>
@@ -1815,7 +1850,7 @@
           <div class="form-panel" id="scFormPanel" style="display:none;margin-bottom:1.5rem">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
               <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text)" id="scFormTitle">Tambah Konten Sosial</h3>
-              <button class="btn-secondary" onclick="hideScForm()">Tutup</button>
+              <button class="btn-secondary" onclick="hideScForm()"><span class="btn-ic"><svg class="ic ic-close" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>Tutup</button>
             </div>
             <input type="hidden" id="scEditId" />
             <div class="form-grid">
@@ -1845,7 +1880,7 @@
                 <label>Thumbnail</label>
                 <div class="upload-zone" onclick="document.getElementById('scThumbFile').click()">
                   <input type="file" id="scThumbFile" accept="image/*" onchange="handleScThumbUpload(event)" />
-                  <div class="uz-icon"></div>
+                  <div class="uz-icon"><svg class="ic ic-image" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
                   <p><strong>Klik untuk upload gambar</strong></p>
                   <p>JPG, PNG, WEBP — maks. 5MB</p>
                 </div>
@@ -1867,7 +1902,7 @@
               </div>
               <div style="margin-left:auto;display:flex;gap:10px">
                 <button class="btn-secondary" onclick="resetScForm()">Reset</button>
-                <button class="btn-primary" onclick="saveSocialContent()" id="scSaveBtn">Simpan Konten</button>
+                <button class="btn-primary" onclick="saveSocialContent()" id="scSaveBtn"><span class="btn-ic"><svg class="ic ic-save" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></span><span class="btn-label">Simpan Konten</span></button>
               </div>
             </div>
           </div>
@@ -1917,7 +1952,7 @@
 
           <!-- Info -->
           <div style="background:rgba(26,58,92,0.06);border:1px solid var(--border);padding:0.9rem 1.2rem;margin-bottom:1.2rem;font-size:0.78rem;color:var(--text-muted);line-height:1.7">
-            <strong style="color:var(--gold)">Cara Kerja Iklan:</strong>
+            <svg class="ic ic-info" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg><strong style="color:var(--gold)">Cara Kerja Iklan:</strong>
             Upload gambar iklan dan masukkan link tujuan. Saat pengunjung mengklik gambar iklan di website, mereka akan diarahkan ke halaman iklan tersebut di tab baru.
             Gunakan <strong style="color:var(--text)">Posisi</strong> untuk mengatur di mana iklan muncul:
             <strong style="color:var(--gold)">Sidebar</strong> = bawah Today in History ·
@@ -1929,7 +1964,7 @@
           <div class="form-panel" id="adFormPanel" style="display:none;margin-bottom:1.5rem">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem">
               <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text)" id="adFormTitle">Tambah Iklan Baru</h3>
-              <button class="btn-secondary" onclick="hideAdForm()">Tutup</button>
+              <button class="btn-secondary" onclick="hideAdForm()"><span class="btn-ic"><svg class="ic ic-close" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></span>Tutup</button>
             </div>
             <input type="hidden" id="adEditId" />
             <div class="form-grid">
@@ -1960,7 +1995,7 @@
                 <label>Gambar Iklan *</label>
                 <div class="upload-zone" onclick="document.getElementById('adImageFile').click()">
                   <input type="file" id="adImageFile" accept="image/*" onchange="handleAdImageUpload(event)" />
-                  <div class="uz-icon"></div>
+                  <div class="uz-icon"><svg class="ic ic-image" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
                   <p><strong>Klik untuk upload gambar iklan</strong></p>
                   <p>JPG, PNG, WEBP — maks. 5MB</p>
                 </div>
@@ -1980,7 +2015,7 @@
               <span class="toggle-label">Aktifkan iklan (tampil di website publik)</span>
               <div style="margin-left:auto;display:flex;gap:10px">
                 <button class="btn-secondary" onclick="resetAdForm()">Reset</button>
-                <button class="btn-primary" onclick="saveAd()" id="adSaveBtn">Simpan Iklan</button>
+                <button class="btn-primary" onclick="saveAd()" id="adSaveBtn"><span class="btn-ic"><svg class="ic ic-save" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg></span><span class="btn-label">Simpan Iklan</span></button>
               </div>
             </div>
           </div>
@@ -2028,10 +2063,20 @@
       let tagDeleteTargetId = null;
 
       // ── UTILITIES ────────────────────────────────────────────────────
+      function setBtnLabel(el, text) {
+        if (!el) return;
+        const label = el.querySelector(".btn-label");
+        if (label) label.textContent = text;
+        else el.textContent = text;
+      }
 
+      const TOAST_ICONS = {
+        success: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;flex-shrink:0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+        error: '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px;flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+      };
       function showToast(msg, type = "success") {
         const t = document.getElementById("toast");
-        t.textContent = msg;
+        t.innerHTML = (TOAST_ICONS[type] || "") + msg;
         t.className = "toast show " + type;
         setTimeout(() => t.classList.remove("show"), 3500);
       }
@@ -2167,13 +2212,13 @@
         <td><span class="badge ${a.published ? "badge-published" : "badge-draft"}">${a.published ? "Published" : "Draft"}</span></td>
         <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(a.created_at)}</td>
         <td style="font-size:.8rem">${(a.views || 0).toLocaleString("id-ID")}</td>
-        <td><div class="td-actions"><button class="btn-edit" onclick="editArticle('${a.id}')">Edit</button><button class="btn-danger" onclick="confirmDelete('${a.id}')">Hapus</button></div></td>
+        <td><div class="td-actions"><button class="btn-edit" onclick="editArticle('${a.id}')"><svg class="ic ic-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit</button><button class="btn-danger" onclick="confirmDelete('${a.id}')"><svg class="ic ic-trash" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Hapus</button></div></td>
       </tr>`,
             )
             .join("");
           setStatus(true);
         } catch (e) {
-          tbody.innerHTML = `<tr><td colspan="8" class="no-data">Gagal memuat: ${e.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="8" class="no-data"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Gagal memuat: ${e.message}</td></tr>`;
           setStatus(false);
         }
       }
@@ -2215,7 +2260,7 @@
         setAuthorMode(a.author_type === "custom" ? "custom" : "team");
 
         document.getElementById("formTitle").textContent = "Edit Artikel";
-        document.getElementById("saveBtn").textContent = "Simpan Perubahan";
+        setBtnLabel(document.getElementById("saveBtn"), "Simpan Perubahan");
         const slugPrev = document.getElementById("slugPreview");
         slugPrev.textContent =
           "/artikel/" + (a.slug || generateSlug(a.title || ""));
@@ -2262,7 +2307,7 @@
         setAuthorMode("team");
         document.getElementById("slugPreview").style.display = "none";
         document.getElementById("formTitle").textContent = "Buat Artikel Baru";
-        document.getElementById("saveBtn").textContent = "Simpan Artikel";
+        setBtnLabel(document.getElementById("saveBtn"), "Simpan Artikel");
         selectedTags = [];
         renderTagChips();
         // Reset multi images
@@ -2294,7 +2339,7 @@
               />
               <span class="img-url-text" title="${img.url}">${img.url}</span>
             </div>
-            <button class="btn-remove-img" onclick="removeArticleImage(${i})">Hapus</button>
+            <button class="btn-remove-img" onclick="removeArticleImage(${i})"><svg class="ic ic-close" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>Hapus</button>
           </div>
         `).join("");
         // Sync first image URL to fImageUrl field for backward compat
@@ -2403,7 +2448,7 @@
       async function sendPushNotification(title, excerpt, slug, imageUrl) {
         const notifArea = document.getElementById("notifStatusArea");
         notifArea.style.display = "block";
-        notifArea.innerHTML = `<span class="notif-status-badge sending">⏳ Mengirim notifikasi...</span>`;
+        notifArea.innerHTML = `<span class="notif-status-badge sending"><svg class="ic ic-clock" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Mengirim notifikasi...</span>`;
 
         const articleUrl = `${window.location.origin}/artikel/${slug}`;
 
@@ -2436,13 +2481,13 @@
             });
             const json = await res.json();
             if (!res.ok) throw new Error(json.error || "Proxy error " + res.status);
-            notifArea.innerHTML = `<span class="notif-status-badge sent">Notifikasi terkirim (${json.recipients || "?"} penerima)</span>`;
+            notifArea.innerHTML = `<span class="notif-status-badge sent"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Notifikasi terkirim (${json.recipients || "?"} penerima)</span>`;
             return;
           }
 
           // Direct call ke OneSignal API (gunakan hanya untuk development/testing)
           if (!ONESIGNAL_REST_KEY || ONESIGNAL_REST_KEY.startsWith("GANTI")) {
-            notifArea.innerHTML = `<span class="notif-status-badge failed">REST API Key belum dikonfigurasi</span>`;
+            notifArea.innerHTML = `<span class="notif-status-badge failed"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>REST API Key belum dikonfigurasi</span>`;
             return;
           }
 
@@ -2457,7 +2502,7 @@
           const json = await res.json();
           if (json.errors) throw new Error(JSON.stringify(json.errors));
           const recipients = json.recipients || 0;
-          notifArea.innerHTML = `<span class="notif-status-badge sent">Notifikasi terkirim ke ${recipients.toLocaleString("id-ID")} subscriber</span>`;
+          notifArea.innerHTML = `<span class="notif-status-badge sent"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Notifikasi terkirim ke ${recipients.toLocaleString("id-ID")} subscriber</span>`;
 
           // Simpan log notifikasi ke Supabase (opsional — tabel notification_logs)
           try {
@@ -2472,7 +2517,7 @@
 
         } catch (err) {
           console.error("OneSignal error:", err);
-          notifArea.innerHTML = `<span class="notif-status-badge failed">Gagal kirim: ${err.message}</span>`;
+          notifArea.innerHTML = `<span class="notif-status-badge failed"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>Gagal kirim: ${err.message}</span>`;
         }
       }
 
@@ -2509,7 +2554,7 @@
 
         const btn = document.getElementById("saveBtn");
         btn.disabled = true;
-        btn.textContent = "Menyimpan...";
+        setBtnLabel(btn, "Menyimpan...");
         try {
           const baseSlug = generateSlug(title);
           const slug = await makeUniqueSlug(baseSlug, id || null);
@@ -2579,7 +2624,7 @@
           showToast("Gagal menyimpan: " + err.message, "error");
         } finally {
           btn.disabled = false;
-          btn.textContent = id ? "Simpan Perubahan" : "Simpan Artikel";
+          setBtnLabel(btn, id ? "Simpan Perubahan" : "Simpan Artikel");
         }
       }
 
@@ -2758,8 +2803,7 @@
         document.getElementById("hPublished").checked = true;
         document.getElementById("historyFormTitle").textContent =
           "Tambah Artikel Sejarah Hari Ini";
-        document.getElementById("hSaveBtn").textContent =
-          "Simpan Artikel Harian";
+        setBtnLabel(document.getElementById("hSaveBtn"), "Simpan Artikel Harian");
       }
 
       async function loadHistory() {
@@ -2793,12 +2837,12 @@
         <td>${statusBadge}</td>
         <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(h.created_at)}</td>
         <td style="font-size:.75rem;color:${expired ? "var(--danger)" : "var(--text-muted)"}">${formatDate(h.expires_at)}<br><small style="font-size:.65rem">${formatTime(h.expires_at)}</small></td>
-        <td><div class="td-actions"><button class="btn-edit" onclick="editHistory('${h.id}')">Edit</button><button class="btn-danger" onclick="confirmDeleteHistory('${h.id}')">Hapus</button></div></td>
+        <td><div class="td-actions"><button class="btn-edit" onclick="editHistory('${h.id}')"><svg class="ic ic-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit</button><button class="btn-danger" onclick="confirmDeleteHistory('${h.id}')"><svg class="ic ic-trash" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Hapus</button></div></td>
       </tr>`;
             })
             .join("");
         } catch (e) {
-          tbody.innerHTML = `<tr><td colspan="6" class="no-data">Gagal memuat: ${e.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" class="no-data"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Gagal memuat: ${e.message}</td></tr>`;
         }
       }
 
@@ -2815,7 +2859,7 @@
           : "";
         document.getElementById("historyFormTitle").textContent =
           "Edit Artikel Sejarah Hari Ini";
-        document.getElementById("hSaveBtn").textContent = "Simpan Perubahan";
+        setBtnLabel(document.getElementById("hSaveBtn"), "Simpan Perubahan");
         document.getElementById("historyFormPanel").style.display = "block";
         document
           .getElementById("historyFormPanel")
@@ -2842,7 +2886,7 @@
         }
         const btn = document.getElementById("hSaveBtn");
         btn.disabled = true;
-        btn.textContent = "Menyimpan...";
+        setBtnLabel(btn, "Menyimpan...");
         try {
           const now = new Date();
           const expires_at = id
@@ -2947,12 +2991,12 @@
         <td style="font-size:.78rem;color:var(--text-muted);max-width:220px">${t.description || '<span style="opacity:.4">—</span>'}</td>
         <td><span style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold)">${t.article_count || 0}</span> <span style="font-size:.7rem;color:var(--text-muted)">artikel</span></td>
         <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(t.created_at)}</td>
-        <td><div class="td-actions"><button class="btn-edit" onclick="editTag('${t.id}')">Edit</button><button class="btn-danger" onclick="confirmDeleteTag('${t.id}')">Hapus</button></div></td>
+        <td><div class="td-actions"><button class="btn-edit" onclick="editTag('${t.id}')"><svg class="ic ic-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit</button><button class="btn-danger" onclick="confirmDeleteTag('${t.id}')"><svg class="ic ic-trash" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Hapus</button></div></td>
       </tr>`,
             )
             .join("");
         } catch (e) {
-          tbody.innerHTML = `<tr><td colspan="6" class="no-data">Gagal memuat: ${e.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" class="no-data"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Gagal memuat: ${e.message}</td></tr>`;
         }
       }
 
@@ -2970,7 +3014,7 @@
         document.getElementById("tSlug").value = "";
         document.getElementById("tDesc").value = "";
         document.getElementById("tagFormTitle").textContent = "Tambah Tag Baru";
-        document.getElementById("tSaveBtn").textContent = "Simpan Tag";
+        setBtnLabel(document.getElementById("tSaveBtn"), "Simpan Tag");
       }
       function updateTagSlugPreview() {
         document.getElementById("tSlug").value = generateSlug(
@@ -2985,7 +3029,7 @@
         document.getElementById("tSlug").value = t.slug || "";
         document.getElementById("tDesc").value = t.description || "";
         document.getElementById("tagFormTitle").textContent = "Edit Tag";
-        document.getElementById("tSaveBtn").textContent = "Simpan Perubahan";
+        setBtnLabel(document.getElementById("tSaveBtn"), "Simpan Perubahan");
         document.getElementById("tagFormPanel").style.display = "block";
         document
           .getElementById("tagFormPanel")
@@ -3003,7 +3047,7 @@
         }
         const btn = document.getElementById("tSaveBtn");
         btn.disabled = true;
-        btn.textContent = "Menyimpan...";
+        setBtnLabel(btn, "Menyimpan...");
         try {
           const payload = { name, slug, description };
           if (id) {
@@ -3024,7 +3068,7 @@
           showToast("Gagal menyimpan: " + err.message, "error");
         } finally {
           btn.disabled = false;
-          btn.textContent = id ? "Simpan Perubahan" : "Simpan Tag";
+          setBtnLabel(btn, id ? "Simpan Perubahan" : "Simpan Tag");
         }
       }
       function confirmDeleteTag(id) {
@@ -3066,7 +3110,11 @@
       let socialContents = [];
       let scDeleteTargetId = null;
 
-      const platformIcons = { TikTok: "TikTok", Instagram: "IG", YouTube: "YT" };
+      const platformIcons = {
+        TikTok: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>',
+        Instagram: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>',
+        YouTube: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>'
+      };
       const platformColors = {
         TikTok: "#69C9D0",
         Instagram: "#E1306C",
@@ -3108,13 +3156,13 @@
               <td style="font-size:.75rem;color:var(--text-muted)">${formatDate(c.published_at)}</td>
               <td><span class="badge ${c.status === 'published' ? 'badge-published' : 'badge-draft'}">${c.status === 'published' ? 'Published' : 'Draft'}</span></td>
               <td><div class="td-actions">
-                <button class="btn-edit" onclick="editSocialContent('${c.id}')">Edit</button>
-                <button class="btn-danger" onclick="confirmDeleteSc('${c.id}')">Hapus</button>
+                <button class="btn-edit" onclick="editSocialContent('${c.id}')"><svg class="ic ic-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit</button>
+                <button class="btn-danger" onclick="confirmDeleteSc('${c.id}')"><svg class="ic ic-trash" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Hapus</button>
               </div></td>
             </tr>`).join("");
           setStatus(true);
         } catch (e) {
-          tbody.innerHTML = `<tr><td colspan="7" class="no-data">Gagal memuat: ${e.message}</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="7" class="no-data"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Gagal memuat: ${e.message}</td></tr>`;
           setStatus(false);
         }
       }
@@ -3138,7 +3186,7 @@
         document.getElementById("scStatus").value = "published";
         document.getElementById("scThumbPreview").style.display = "none";
         document.getElementById("scFormTitle").textContent = "Tambah Konten Sosial";
-        document.getElementById("scSaveBtn").textContent = "Simpan Konten";
+        setBtnLabel(document.getElementById("scSaveBtn"), "Simpan Konten");
         const fi = document.getElementById("scThumbFile");
         if (fi) fi.value = "";
       }
@@ -3200,7 +3248,7 @@
           img.src = c.thumbnail_url; img.style.display = "block";
         }
         document.getElementById("scFormTitle").textContent = "Edit Konten Sosial";
-        document.getElementById("scSaveBtn").textContent = "Simpan Perubahan";
+        setBtnLabel(document.getElementById("scSaveBtn"), "Simpan Perubahan");
         document.getElementById("scFormPanel").style.display = "block";
         document.getElementById("scFormPanel").scrollIntoView({ behavior: "smooth" });
       }
@@ -3217,7 +3265,7 @@
         if (!content_url) { showToast("URL konten tidak boleh kosong", "error"); return; }
         if (!published_at) { showToast("Tanggal publikasi harus diisi", "error"); return; }
         const btn = document.getElementById("scSaveBtn");
-        btn.disabled = true; btn.textContent = "Menyimpan...";
+        btn.disabled = true; setBtnLabel(btn, "Menyimpan...");
         try {
           const now = new Date().toISOString();
           const payload = { title, platform, thumbnail_url: thumbnail_url || null, content_url, published_at, status, updated_at: now };
@@ -3235,7 +3283,7 @@
           showToast("Gagal menyimpan: " + err.message, "error");
         } finally {
           btn.disabled = false;
-          btn.textContent = id ? "Simpan Perubahan" : "Simpan Konten";
+          setBtnLabel(btn, id ? "Simpan Perubahan" : "Simpan Konten");
         }
       }
       function confirmDeleteSc(id) {
@@ -3295,7 +3343,7 @@
                 ? `<a href="${ad.link_url}" target="_blank" rel="noopener" title="Buka link iklan">
                      <img class="ad-card-img" src="${ad.image_url}" onerror="this.style.display='none'" alt="${ad.title}" />
                    </a>`
-                : `<div class="ad-card-img-placeholder">Tidak ada gambar</div>`}
+                : `<div class="ad-card-img-placeholder"><svg class="ic ic-image-sm" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:5px"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>Tidak ada gambar</div>`}
               <div class="ad-card-body">
                 <div class="ad-card-title" title="${ad.title}">${ad.title}</div>
                 <a class="ad-card-link" href="${ad.link_url}" target="_blank" rel="noopener" title="${ad.link_url}">↗ ${ad.link_url}</a>
@@ -3306,14 +3354,14 @@
                     <span class="badge ${ad.is_active ? 'badge-published' : 'badge-draft'}">${ad.is_active ? 'Aktif' : 'Nonaktif'}</span>
                   </div>
                   <div class="ad-card-actions">
-                    <button class="btn-edit" onclick="editAd('${ad.id}')">Edit</button>
-                    <button class="btn-danger" onclick="confirmDeleteAd('${ad.id}')">Hapus</button>
+                    <button class="btn-edit" onclick="editAd('${ad.id}')"><svg class="ic ic-edit" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>Edit</button>
+                    <button class="btn-danger" onclick="confirmDeleteAd('${ad.id}')"><svg class="ic ic-trash" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>Hapus</button>
                   </div>
                 </div>
               </div>
             </div>`).join("");
         } catch (e) {
-          grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)">Gagal memuat: ${e.message}</div>`;
+          grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:5px"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Gagal memuat: ${e.message}</div>`;
         }
       }
 
@@ -3339,7 +3387,7 @@
         const fi = document.getElementById("adImageFile");
         if (fi) fi.value = "";
         document.getElementById("adFormTitle").textContent = "Tambah Iklan Baru";
-        document.getElementById("adSaveBtn").textContent = "Simpan Iklan";
+        setBtnLabel(document.getElementById("adSaveBtn"), "Simpan Iklan");
       }
       function previewAdImage() {
         const url = document.getElementById("adImageUrl").value.trim();
@@ -3388,7 +3436,7 @@
           img.src = ad.image_url; img.style.display = "block";
         }
         document.getElementById("adFormTitle").textContent = "Edit Iklan";
-        document.getElementById("adSaveBtn").textContent = "Simpan Perubahan";
+        setBtnLabel(document.getElementById("adSaveBtn"), "Simpan Perubahan");
         document.getElementById("adFormPanel").style.display = "block";
         document.getElementById("adFormPanel").scrollIntoView({ behavior: "smooth" });
       }
@@ -3404,7 +3452,7 @@
         if (!link_url) { showToast("Link tujuan tidak boleh kosong", "error"); return; }
         if (!image_url) { showToast("Upload atau masukkan URL gambar iklan terlebih dahulu", "error"); return; }
         const btn = document.getElementById("adSaveBtn");
-        btn.disabled = true; btn.textContent = "Menyimpan...";
+        btn.disabled = true; setBtnLabel(btn, "Menyimpan...");
         try {
           const now = new Date().toISOString();
           const payload = { title, link_url, image_url, position, ad_order, is_active, updated_at: now };
@@ -3422,7 +3470,7 @@
           showToast("Gagal menyimpan: " + err.message, "error");
         } finally {
           btn.disabled = false;
-          btn.textContent = id ? "Simpan Perubahan" : "Simpan Iklan";
+          setBtnLabel(btn, id ? "Simpan Perubahan" : "Simpan Iklan");
         }
       }
       function confirmDeleteAd(id) {
